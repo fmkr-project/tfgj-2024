@@ -21,6 +21,18 @@ public class CardManager
         return _inner[rand.Next(_inner.Count)];
     }
 
+    public InnerCard ForcePullInner(string shortTitle)
+    {
+        // Use only during the tutorial!
+        return _inner.FirstOrDefault(card => card.ShortTitle == shortTitle);
+    }
+
+    public OuterCard ForcePullOuter(string shortTitle)
+    {
+        // Use only during the tutorial!
+        return _outer.FirstOrDefault(card => card.ShortTitle == shortTitle);
+    }
+
     public OuterCard PullOuter(InnerCard reference, int threshold, GameDifficulty diff)
     {
         var rand = new Random();

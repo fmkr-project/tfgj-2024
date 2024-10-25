@@ -11,6 +11,7 @@ namespace UI
         private Fader _fader;
         
         private DialogueManager _dialogueManager;
+        private UICardManager _uiCardManager;
         
         // Flags
         private bool _isInGame;
@@ -31,6 +32,7 @@ namespace UI
             _fader = GetComponentInChildren<Fader>();
 
             _dialogueManager = GetComponentInChildren<DialogueManager>();
+            _uiCardManager = GetComponentInChildren<UICardManager>();
         }
 
         private void Start()
@@ -96,6 +98,8 @@ namespace UI
             StartCoroutine(_menuItemList.HideAllItems());
             yield return new WaitForSeconds(0.25f);
 
+            // Introduction dialogue.
+            
             StartCoroutine(_dialogueManager.KeineAppear("Lorem ipsum dolor sit amet"));
             // Boilerplate yay!
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
@@ -113,6 +117,34 @@ namespace UI
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
             while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
             
+            _dialogueManager.KeineChangeDialogue("Ce train JUJU a pour destination Juvisy. Il desservira toutes les gares d'Invalides à Bibliothèque François Mitterrand et toutes les gares des Ardoines à Juvisy.");
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            
+            StartCoroutine(_dialogueManager.OtherRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+            StartCoroutine(_dialogueManager.OtherAppear("I think I'm dead."));
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+            StartCoroutine(_dialogueManager.KeineRetire());
+            StartCoroutine(_dialogueManager.OtherRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+
+            // Forced game.
+            // TODO actually force the cards
+            StartCoroutine(_uiCardManager.ShowCards());
+            yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+            // Keine pops.
+            StartCoroutine(_dialogueManager.KeineAppear("I should give actual advice to the player about how to play."));
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            // And unpops.
+            StartCoroutine(_dialogueManager.KeineRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            
+            // Wait for player input. The other input (wrong answer) is disabled.
             
             yield return null;
         }

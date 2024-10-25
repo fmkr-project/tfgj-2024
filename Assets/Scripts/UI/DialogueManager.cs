@@ -42,6 +42,16 @@ namespace UI
             yield return null;
         }
 
+        public void KeineChangeDialogue(string text)
+        {
+            _keineBox.ChangeDialogue(text);
+        }
+
+        public void OtherChangeDialogue(string text)
+        {
+            _otherBox.ChangeDialogue(text);
+        }
+
         public IEnumerator OtherAppear(string text)
         {
             _otherBox.gameObject.SetActive(true);

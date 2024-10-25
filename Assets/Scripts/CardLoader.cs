@@ -50,29 +50,28 @@ public static class CardLoader
             
             var year = int.Parse(values[0]);
             var shortTitle = values[1];
-            var tag = values[2];
-            bool kokunai;
-            kokunai = values[3] switch
+            var tag = values[2] switch
+            {
+                "event" => CardTag.Event,
+                "people" => CardTag.People,
+                "place" => CardTag.Place,
+                "tech" => CardTag.Tech,
+                "d_tech" => CardTag.DeadTech,
+                _ => throw new ArgumentException($"Unknown tag for card: {shortTitle}!")
+            };
+            var kokunai = values[3] switch
             {
                 "0" => false,
                 "1" => true,
                 _ => throw new ArgumentException($"Unknown boolean for card: {shortTitle}!")
             };
-            GameDifficulty diff;
-            switch (values[4])
+            GameDifficulty diff = values[4] switch
             {
-                case "easy":
-                    diff = GameDifficulty.Easy;
-                    break;
-                case "noteasy":
-                    diff = GameDifficulty.LessEasy;
-                    break;
-                case "akyuu":
-                    diff = GameDifficulty.Akyuu;
-                    break;
-                default:
-                    throw new ArgumentException($"Can't parse the difficulty for card: {shortTitle}!");
-            }
+                "easy" => GameDifficulty.Easy,
+                "noteasy" => GameDifficulty.LessEasy,
+                "akyuu" => GameDifficulty.Akyuu,
+                _ => throw new ArgumentException($"Can't parse the difficulty for card: {shortTitle}!")
+            };
             var flavor = values[5];
             var source = values[6];
             var description = values[7];
