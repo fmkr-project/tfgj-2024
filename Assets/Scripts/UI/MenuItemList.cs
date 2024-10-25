@@ -103,5 +103,12 @@ namespace UI
                 return "";
             }
         }
+
+        public IEnumerator HideAllItems()
+        {
+            foreach (var item in _menuItems)
+                StartCoroutine(item.Hide());
+            yield return null;
+        }
     }
 }

@@ -32,6 +32,16 @@ namespace UI
             UpdateAnchors();
         }
 
+        public void Show()
+        {
+            _texture.enabled = true;
+        }
+
+        public void Hide()
+        {
+            _texture.enabled = false;
+        }
+
         public void UpdateAnchors()
         {
             var correctedPosition = maxPosition - position - 1;

@@ -59,7 +59,6 @@ public static class CardLoader
                 _ => throw new ArgumentException($"Unknown boolean for card: {shortTitle}!")
             };
             GameDifficulty diff;
-            Debug.Log(values[4]);
             switch (values[4])
             {
                 case "easy":
