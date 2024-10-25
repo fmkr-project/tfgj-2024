@@ -12,6 +12,7 @@ namespace UI
 
         private RectTransform _rectTransform;
         private Image _texture;
+        private const float StepDuration = 0.8f;
 
         private void Awake()
         {

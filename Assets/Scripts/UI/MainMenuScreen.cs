@@ -37,6 +37,35 @@ namespace UI
                 _arrow.MoveUp();
             if (Input.GetKeyDown(KeyCode.S))
                 _arrow.MoveDown();
+            
+            if (Input.GetKeyDown(KeyCode.Return)) 
+            { 
+                if (_menuItemList.menuState == MenuState.MainMenu)
+                { 
+                    switch (_menuItemList.GetTextUnderArrow(_arrow.position)) 
+                    {
+                        case "Play!":
+                            StartCoroutine(_menuItemList.ChangeMenuState(MenuState.DiffMenu));
+                            break;
+                        default:
+                            Debug.Log("TODO");
+                            break;
+                    } 
+                }
+
+                if (_menuItemList.menuState == MenuState.DiffMenu)
+                {
+                    switch (_menuItemList.GetTextUnderArrow(_arrow.position))
+                    {
+                        case "Back!":
+                            StartCoroutine(_menuItemList.ChangeMenuState(MenuState.MainMenu));
+                            break;
+                        default:
+                            Debug.Log("TODO");
+                            break;
+                    }
+                }
+            }
         }
     }
 }

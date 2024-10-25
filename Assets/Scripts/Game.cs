@@ -8,7 +8,10 @@ public class Game : MonoBehaviour
     private void Awake()
     {
         _cardManager.LoadCards();
-        var test = _cardManager.PullOuter(_cardManager.PullInner(), 100, GameDifficulty.Akyuu);
-        print(test);
+        for (int i = 0; i < 10; i++)
+        {
+            var test = _cardManager.PullOuter(_cardManager.PullInner(), 100, GameDifficulty.Akyuu);
+            print(test);
+        }
     }
 }
