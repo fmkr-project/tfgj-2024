@@ -19,7 +19,7 @@ namespace UI
         
         private readonly List<string> _mainMenuItemNames = new List<string> { "Play!", "Collection", "Settings", "Quit!" };
 
-        private const float StartYAnchor = 0.5f;
+        public const float StartYAnchor = 0.5f;
 
         private void Start()
         {

@@ -8,22 +8,34 @@ namespace UI
     {
         public int position;
         public int maxPosition;
+        public float startYAnchor;
 
+        private RectTransform _rectTransform;
         private Image _texture;
 
         private void Awake()
         {
             _texture = transform.Find("Canvas/Texture").GetComponent<Image>();
+            _rectTransform = _texture.GetComponent<RectTransform>();
         }
 
-        private void MoveUp()
+        public void MoveUp()
         {
             position = Math.Clamp(position + 1, 0, maxPosition - 1);
+            UpdateAnchors();
         }
 
-        private void MoveDown()
+        public void MoveDown()
         {
             position = Math.Clamp(position - 1, 0, maxPosition - 1);
+            UpdateAnchors();
+        }
+
+        public void UpdateAnchors()
+        {
+            var correctedPosition = maxPosition - position - 1;
+            _rectTransform.anchorMin = new Vector2(0.7f, startYAnchor - (0.12f * correctedPosition) + 0.025f);
+            _rectTransform.anchorMax = new Vector2(0.73f, startYAnchor - (0.12f * correctedPosition) + 0.075f);
         }
     }
 }

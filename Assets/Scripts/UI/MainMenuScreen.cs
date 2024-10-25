@@ -19,12 +19,24 @@ namespace UI
                 MenuState.DiffMenu => _menuItemList.GetDiffMenuItemCount(),
                 _ => _arrow.maxPosition
             };
+            _arrow.startYAnchor = MenuItemList.StartYAnchor;
+            _arrow.UpdateAnchors();
+            
             _fader = GetComponentInChildren<Fader>();
         }
 
         private void Start()
         {
             StartCoroutine(_fader.FadeIn(0.5f));
+        }
+
+        private void Update()
+        {
+            // Arrow controls
+            if (Input.GetKeyDown(KeyCode.W))
+                _arrow.MoveUp();
+            if (Input.GetKeyDown(KeyCode.S))
+                _arrow.MoveDown();
         }
     }
 }
