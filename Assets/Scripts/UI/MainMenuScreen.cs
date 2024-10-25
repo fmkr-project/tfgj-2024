@@ -19,7 +19,7 @@ namespace UI
                 MenuState.DiffMenu => _menuItemList.GetDiffMenuItemCount(),
                 _ => _arrow.maxPosition
             };
-            _arrow.startYAnchor = MenuItemList.StartYAnchor;
+            _arrow.endYAnchor = MenuItemList.EndYAnchor;
             _arrow.UpdateAnchors();
             
             _fader = GetComponentInChildren<Fader>();
@@ -46,6 +46,9 @@ namespace UI
                     {
                         case "Play!":
                             StartCoroutine(_menuItemList.ChangeMenuState(MenuState.DiffMenu));
+                            _arrow.maxPosition = _menuItemList.GetDiffMenuItemCount();
+                            _arrow.position = 0;
+                            _arrow.UpdateAnchors();
                             break;
                         default:
                             Debug.Log("TODO");
@@ -59,6 +62,9 @@ namespace UI
                     {
                         case "Back!":
                             StartCoroutine(_menuItemList.ChangeMenuState(MenuState.MainMenu));
+                            _arrow.maxPosition = _menuItemList.GetMainMenuItemCount();
+                            _arrow.position = 0;
+                            _arrow.UpdateAnchors();
                             break;
                         default:
                             Debug.Log("TODO");

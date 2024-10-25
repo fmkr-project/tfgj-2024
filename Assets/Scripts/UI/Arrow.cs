@@ -8,7 +8,7 @@ namespace UI
     {
         public int position;
         public int maxPosition;
-        public float startYAnchor;
+        public float endYAnchor;
 
         private RectTransform _rectTransform;
         private Image _texture;
@@ -22,21 +22,21 @@ namespace UI
 
         public void MoveUp()
         {
-            position = Math.Clamp(position + 1, 0, maxPosition - 1);
+            position = Math.Clamp(position - 1, 0, maxPosition - 1);
             UpdateAnchors();
         }
 
         public void MoveDown()
         {
-            position = Math.Clamp(position - 1, 0, maxPosition - 1);
+            position = Math.Clamp(position + 1, 0, maxPosition - 1);
             UpdateAnchors();
         }
 
         public void UpdateAnchors()
         {
             var correctedPosition = maxPosition - position - 1;
-            _rectTransform.anchorMin = new Vector2(0.7f, startYAnchor - (0.12f * correctedPosition) + 0.025f);
-            _rectTransform.anchorMax = new Vector2(0.73f, startYAnchor - (0.12f * correctedPosition) + 0.075f);
+            _rectTransform.anchorMin = new Vector2(0.7f, endYAnchor + (0.12f * correctedPosition) + 0.025f);
+            _rectTransform.anchorMax = new Vector2(0.73f, endYAnchor + (0.12f * correctedPosition) + 0.075f);
         }
     }
 }
