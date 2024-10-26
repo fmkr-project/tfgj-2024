@@ -46,5 +46,28 @@ namespace UI
 
             _rectTransform.localRotation = Quaternion.Euler(0, 0, 0);
         }
+
+        public IEnumerator Hide(CardRotationDirection toDirection)
+        {
+            // Definitely boilerplate.
+            var finalRotation = toDirection switch
+            {
+                CardRotationDirection.Up => Quaternion.Euler(-90, 0, 0),
+                CardRotationDirection.Down => Quaternion.Euler(90, 0, 0)
+            };
+
+            var elapsed = 0f;
+            while (elapsed < _popTime)
+            {
+                var deltaTime = Time.deltaTime;
+                elapsed += deltaTime;
+                var t = elapsed / _popTime;
+                _rectTransform.localRotation = Quaternion.Lerp(Quaternion.Euler(0, 0, 0), finalRotation,
+                    (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
+                yield return new WaitForSeconds(deltaTime);
+            }
+
+            _rectTransform.localRotation = finalRotation;
+        }
     }
 }

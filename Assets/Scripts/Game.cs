@@ -21,8 +21,38 @@ public class Game : MonoBehaviour
             print(test);
         }
     }
-    
+
+    private void Start()
+    {
+        _mainMenuScreen.callTutorialTurn1.AddListener(ForceTutorial1);
+        _mainMenuScreen.callTutorialTurn2.AddListener(ForceTutorial2);
+        _mainMenuScreen.callNextTurn.AddListener(GetCards);
+    }
+
     public void Turn()
     {
+    }
+
+    private void ForceGetCards(string innerSt, string outerSt)
+    {
+        _mainMenuScreen.UpdateCardDisplay(
+            _cardManager.ForcePullInner(innerSt),
+            _cardManager.ForcePullOuter(outerSt)
+            );
+    }
+
+    private void ForceTutorial1()
+    {
+        ForceGetCards("Akyuu's birth", "American Civil War");
+    }
+
+    private void ForceTutorial2()
+    {
+        ForceGetCards("Akyuu's birth", "Okinawa restitution");
+    }
+
+    private void GetCards()
+    {
+        
     }
 }

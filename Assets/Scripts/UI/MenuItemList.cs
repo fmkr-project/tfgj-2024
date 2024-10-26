@@ -110,5 +110,12 @@ namespace UI
                 StartCoroutine(item.Hide());
             yield return null;
         }
+
+        public IEnumerator ShowAllItems()
+        {
+            foreach (var item in _menuItems)
+                StartCoroutine(item.Show());
+            yield return null;
+        }
     }
 }
