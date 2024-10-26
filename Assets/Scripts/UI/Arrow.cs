@@ -17,7 +17,7 @@ namespace UI
         private void Awake()
         {
             _texture = transform.Find("Canvas/Texture").GetComponent<Image>();
-            _rectTransform = _texture.GetComponent<RectTransform>();
+            _rectTransform = transform.Find("Canvas/Texture").GetComponent<RectTransform>();
         }
 
         public void MoveUp()

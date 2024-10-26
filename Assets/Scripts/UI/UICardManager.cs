@@ -73,7 +73,7 @@ namespace UI
             _outerUI.SetupCard(outer);
         }
 
-        public IEnumerator Choose(Selected what)
+        public IEnumerator Choose(Selected what, bool forced)
         {
             switch (what)
             {
@@ -91,6 +91,13 @@ namespace UI
                 : AnswerAnimation(what == Selected.Up));
 
             // TODO UnityEvent with Game
+            if (forced) yield break;
+            if ((Card.CompareYear(_inner, _outer) && what == Selected.Down) ||
+                (!Card.CompareYear(_inner, _outer) && what == Selected.Up))
+            {
+                CardManager.Unlock(_inner);
+                CardManager.Unlock(_outer);
+            }
 
             yield return null;
         }

@@ -7,10 +7,18 @@ using UnityEngine.UI;
 
 namespace UI
 {
+    public enum CollectionSide
+    {
+        Inner,
+        Outer
+    }
+    
     public class CollectionMenu : MonoBehaviour
     {
         [SerializeField] private GameObject arrow;
         private Vector3 _arrowStartPosition;
+        private Vector2 _arrowStartAnchorMin;
+        private Vector2 _arrowStartAnchorMax;
         private RectTransform _arrowRectTransform;
         
         [SerializeField] private GameObject textField1;
@@ -21,7 +29,7 @@ namespace UI
 
         private float _animationDuration = 0.22f;
         private float _animationOffset = 2200f;
-        private float _arrowStep = 0.14f;
+        private float _arrowStep = 0.111f;
         
         private List<GameObject> _textFieldList;
 
@@ -30,10 +38,12 @@ namespace UI
         private RectTransform _cardRectTransform;
         private Vector3 _cardStartPosition;
 
-        private bool _isDisplayingInner = true;
+        private CollectionSide _displayedSide = CollectionSide.Inner;
         private int _firstDisplayed;
         private List<Card> _displayedCards = new();
         private int _arrowPosition;
+
+        public bool isReady;
 
         private void Awake()
         {
@@ -48,13 +58,16 @@ namespace UI
             _arrowStartPosition = _arrowRectTransform.localPosition;
             _arrowRectTransform.localPosition -= _animationOffset * Vector3.down;
             
+            _arrowStartAnchorMin = _arrowRectTransform.anchorMin;
+            _arrowStartAnchorMax = _arrowRectTransform.anchorMax;
+            
             transform.Find("Canvas/Card/Image").GetComponent<Image>().preserveAspect = true;
         }
 
         public void ShowFrom(int first)
         {
             _firstDisplayed = first;
-            if (_isDisplayingInner)
+            if (_displayedSide == CollectionSide.Inner)
             {
                 for (int i = first; i < first + 5; i++)
                 {
@@ -68,14 +81,33 @@ namespace UI
                     }
                 }
             }
+            
+            if (_displayedSide == CollectionSide.Outer)
+            {
+                for (int i = first; i < first + 5; i++)
+                {
+                    try
+                    {
+                        _displayedCards.Add(CardManager.Outer[i]);
+                    }
+                    catch (ArgumentOutOfRangeException)
+                    {
+                        break;
+                    }
+                }
+            }
 
             for (var i = 0; i < _displayedCards.Count; i++)
             {
                 // Set year
-                _textFieldList[i].GetComponent<TextMeshProUGUI>().SetText(_displayedCards[i].Year.ToString());
+                _textFieldList[i].GetComponent<TextMeshProUGUI>().SetText(CardManager.CardIsUnlocked(_displayedCards[i])
+                ? _displayedCards[i].Year.ToString()
+                : "????");
                 // Set flavor
                 _textFieldList[i].transform.Find("Flavor").GetComponent<TextMeshProUGUI>()
-                    .SetText(_displayedCards[i].FlavorText);
+                    .SetText(CardManager.CardIsUnlocked(_displayedCards[i])
+                ? _displayedCards[i].FlavorText
+                : "??? ? ???? ? ?????");
             }
 
             for (var i = _displayedCards.Count; i < 5; i++)
@@ -85,10 +117,15 @@ namespace UI
                 _textFieldList[i].transform.Find("Flavor").GetComponent<TextMeshProUGUI>()
                     .SetText("");
             }
+            
+            UpdateCard(_displayedCards[_arrowPosition]);
         }
 
         public IEnumerator Show()
         {
+            _arrowPosition = 0;
+            UpdateArrowTexture();
+            
             var elapsed = 0f;
 
             // Some extreme boilerplate here
@@ -111,10 +148,13 @@ namespace UI
                     (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
                 yield return new WaitForSeconds(deltaTime);
             }
+
+            isReady = true;
         }
 
         public IEnumerator Hide()
         {
+            isReady = false;
             var elapsed = 0f;
 
             while (elapsed < _animationDuration)
@@ -138,44 +178,81 @@ namespace UI
             }
 
             _displayedCards.Clear();
+            _arrowPosition = 0;
         }
 
         public void MoveArrowUp()
         {
-            _arrowPosition = Math.Clamp(_arrowPosition - 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+            if (_arrowPosition == 0 && _firstDisplayed >= 5)
+                // Try to move up if there are more cards to be displayed.
+            {
+                _firstDisplayed -= 5;
+                _arrowPosition = 4;
+                _displayedCards.Clear();
+                ShowFrom(_firstDisplayed);
+            }
+            else _arrowPosition = Math.Clamp(_arrowPosition - 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
             UpdateCard(_displayedCards[_arrowPosition]);
+            UpdateArrowTexture();
         }
 
         public void MoveArrowDown()
         {
-            _arrowPosition = Math.Clamp(_arrowPosition + 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+            if (_arrowPosition == 4 &&
+                ((_firstDisplayed < CardManager.Inner.Count - 5 && _displayedSide == CollectionSide.Inner) ||
+                (_firstDisplayed < CardManager.Outer.Count - 5 && _displayedSide == CollectionSide.Outer)))
+                // Try to move down if there are more cards to be displayed.
+            {
+                _firstDisplayed += 5;
+                _arrowPosition = 0;
+                _displayedCards.Clear();
+                ShowFrom(_firstDisplayed);
+            }
+            else _arrowPosition = Math.Clamp(_arrowPosition + 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
             UpdateCard(_displayedCards[_arrowPosition]);
+            UpdateArrowTexture();
         }
 
-        public void SwitchSide()
+        public void SwitchSide(CollectionSide cs)
         {
-            _isDisplayingInner = !_isDisplayingInner;
+            _displayedSide = cs;
+            _displayedCards.Clear();
+            _arrowPosition = 0;
+            UpdateArrowTexture();
+            ShowFrom(0);
+        }
+
+        private void UpdateArrowTexture()
+        {
+            _arrowRectTransform.anchorMin = _arrowStartAnchorMin - new Vector2(0, _arrowStep * _arrowPosition);
+            _arrowRectTransform.anchorMax = _arrowStartAnchorMax - new Vector2(0, _arrowStep * _arrowPosition);
         }
 
         private void UpdateCard(Card reference)
         {
+            var isUnlocked = CardManager.CardIsUnlocked(reference);
+            
             // Update image
             transform.Find("Canvas/Card/Image").GetComponent<Image>().sprite =
-                Resources.Load<Sprite>(Resources.Load<Sprite>(reference.GetImageUrl()) is not null
+                Resources.Load<Sprite>(Resources.Load<Sprite>(reference.GetImageUrl()) is not null && isUnlocked
                     ? reference.GetImageUrl()
                     : "unknown_card");
             
             // Update title
-            transform.Find("Canvas/Card/ShortTitle").GetComponent<TextMeshProUGUI>().SetText(reference.ShortTitle);
+            transform.Find("Canvas/Card/ShortTitle").GetComponent<TextMeshProUGUI>().SetText(
+                isUnlocked ? reference.ShortTitle : "??????????");
             
             // Update source
-            transform.Find("Canvas/Card/Source").GetComponent<TextMeshProUGUI>().SetText(reference.Source);
+            transform.Find("Canvas/Card/Source").GetComponent<TextMeshProUGUI>().SetText(
+                isUnlocked ? reference.Source : "?");
             
             // Update description
-            transform.Find("Canvas/Card/Desc").GetComponent<TextMeshProUGUI>().SetText(reference.Description);
+            transform.Find("Canvas/Card/Desc").GetComponent<TextMeshProUGUI>().SetText(
+                isUnlocked ? reference.Description : "??? ? ???? ? ????? ????????? ?? ?????? ????? ??? ????? ???????? ????????? ??????? ????????? ???");
             
             // Update comments
-            transform.Find("Canvas/Card/Comm").GetComponent<TextMeshProUGUI>().SetText(reference.Comments);
+            transform.Find("Canvas/Card/Comm").GetComponent<TextMeshProUGUI>().SetText(
+                isUnlocked ? reference.Comments : "??? ? ???? ? ????? ????????? ?? ?????? ????? ??? ?????");
         }
     }
 }

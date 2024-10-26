@@ -21,7 +21,7 @@ namespace UI
         private float _remoteDistance = 2000;
         private float _remoteTransition = 0.25f;
 
-        private void Start()
+        private void Awake()
         {
             _portrait = transform.Find("Canvas/Pp").GetComponent<Image>();
             _dialogueText = transform.Find("Canvas/Bg/DialogueText").GetComponent<TextMeshProUGUI>();

@@ -46,7 +46,6 @@ namespace UI
                 _ => _arrow.maxPosition
             };
             _arrow.endYAnchor = MenuItemList.EndYAnchor;
-            _arrow.UpdateAnchors();
             
             _fader = GetComponentInChildren<Fader>();
 
@@ -57,6 +56,7 @@ namespace UI
 
         private void Start()
         {
+            _arrow.UpdateAnchors();
             StartCoroutine(_fader.FadeIn(0.5f));
         }
 
@@ -65,6 +65,8 @@ namespace UI
             // Controls in the collection menu
             if (_isCollectionMenuOpen)
             {
+                if (!_collectionMenu.isReady) return;
+                
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     StartCoroutine(_collectionMenu.Hide());
@@ -74,6 +76,10 @@ namespace UI
                     _collectionMenu.MoveArrowUp();
                 if (Input.GetKeyDown(KeyCode.S))
                     _collectionMenu.MoveArrowDown();
+                if (Input.GetKeyDown(KeyCode.Q))
+                    _collectionMenu.SwitchSide(CollectionSide.Inner);
+                if (Input.GetKeyDown(KeyCode.E))
+                    _collectionMenu.SwitchSide(CollectionSide.Outer);
 
                 return;
             }
@@ -156,30 +162,30 @@ namespace UI
             StartCoroutine(_dialogueManager.KeineAppear("Lorem ipsum dolor sit amet"));
             // Boilerplate yay!
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             _dialogueManager.ChangeOtherTalking(new Who("Rumia"));
             StartCoroutine(_dialogueManager.OtherAppear("Is that so...?"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
 
             StartCoroutine(_dialogueManager.OtherRetire());
             yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
             _dialogueManager.ChangeOtherTalking(new Who("Dai"));
             StartCoroutine(_dialogueManager.OtherAppear("Yay, I can talk!"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             _dialogueManager.KeineChangeDialogue("Ce train JUJU(ko) a pour destination Juvisy. Il desservira toutes les gares d'Invalides à Bibliothèque François Mitterrand et toutes les gares des Ardoines à Juvisy.");
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             StartCoroutine(_dialogueManager.OtherRetire());
             yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
             _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
             StartCoroutine(_dialogueManager.OtherAppear("I think I'm dead."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
 
             // Prepare the cards for the first tutorial turn.
             callTutorialTurn1.Invoke();
@@ -195,12 +201,12 @@ namespace UI
             // During this part, the player can't skip to pressing W.
             StartCoroutine(_dialogueManager.KeineAppear("I should give actual advice to the player about how to play."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             // Dai actually listens. Crazy, right.
             _dialogueManager.ChangeOtherTalking(new Who("Dai"));
             StartCoroutine(_dialogueManager.OtherAppear("Frogs go mlem mlem, snakes go pbbtpptbpbptbpt, fairies go pichu~n"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             // Everyone unpops.
             StartCoroutine(_dialogueManager.KeineRetire());
             StartCoroutine(_dialogueManager.OtherRetire());
@@ -209,7 +215,7 @@ namespace UI
             // Wait for player input. The other input (wrong answer) is disabled.
             // Don't use this code for the main loop.
             while (!Input.GetKeyDown(KeyCode.W)) yield return new WaitForSeconds(Time.deltaTime);
-            StartCoroutine(_uiCardManager.Choose(Selected.Up));
+            StartCoroutine(_uiCardManager.Choose(Selected.Up, true));
             while (!Input.GetKeyUp(KeyCode.W)) yield return new WaitForSeconds(Time.deltaTime);
             
             // Wait for animation to end
@@ -219,12 +225,12 @@ namespace UI
             StartCoroutine(_uiCardManager.HideCards());
             StartCoroutine(_dialogueManager.KeineAppear("It's Keine again!"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             _dialogueManager.ChangeOtherTalking(new Who("Dai"));
             StartCoroutine(_dialogueManager.OtherAppear("Object event."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             callTutorialTurn2.Invoke();
             
             StartCoroutine(_dialogueManager.KeineRetire());
@@ -239,13 +245,13 @@ namespace UI
             
             StartCoroutine(_dialogueManager.KeineAppear("I should give more advice, but I'm going to say some nonsense for now."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             // Dai again.
             _dialogueManager.ChangeOtherTalking(new Who("Dai"));
             StartCoroutine(_dialogueManager.OtherAppear("Does the existence of Lunate Elf implies that there may be a Lunate Zwölf?"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             // Everyone unpops.
             StartCoroutine(_dialogueManager.KeineRetire());
             StartCoroutine(_dialogueManager.OtherRetire());
@@ -254,7 +260,7 @@ namespace UI
             // Wait for player input. The other input (wrong answer) is disabled.
             // Again, don't use this code for the main loop.
             while (!Input.GetKeyDown(KeyCode.S)) yield return new WaitForSeconds(Time.deltaTime);
-            StartCoroutine(_uiCardManager.Choose(Selected.Down));
+            StartCoroutine(_uiCardManager.Choose(Selected.Down, true));
             while (!Input.GetKeyUp(KeyCode.S)) yield return new WaitForSeconds(Time.deltaTime);
             yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
             
@@ -262,12 +268,12 @@ namespace UI
             StartCoroutine(_uiCardManager.HideCards());
             StartCoroutine(_dialogueManager.KeineAppear("Boo! This would have been scarier if I was that karakasa."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
             StartCoroutine(_dialogueManager.OtherAppear("Rindfleischetikettierungsüberwachungsaufgabenübertragungsgesetz."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-            while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+            yield return new WaitForSeconds(Time.deltaTime);
             
             // Tutorial ends.
             // Other thresholds should be explained here.
@@ -301,12 +307,12 @@ namespace UI
             {
                 StartCoroutine(_dialogueManager.KeineAppear("njut njut njut njut njut njut njut njut njut"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 _dialogueManager.ChangeOtherTalking(new Who("Rumia"));
                 StartCoroutine(_dialogueManager.OtherAppear("*insert Polish noises*"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -317,11 +323,11 @@ namespace UI
                 _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
                 StartCoroutine(_dialogueManager.OtherAppear("Speech order can be inverted! Although it's not particularly elegant."));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 StartCoroutine(_dialogueManager.KeineAppear("yeah"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -331,12 +337,12 @@ namespace UI
             {
                 StartCoroutine(_dialogueManager.KeineAppear("hej"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
                 StartCoroutine(_dialogueManager.OtherAppear("ayo"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -357,7 +363,7 @@ namespace UI
                 while (!Input.GetKeyDown(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
                     yield return new WaitForSeconds(Time.deltaTime);
                 var selected = Input.GetKeyDown(KeyCode.W) ? Selected.Up : Selected.Down;
-                StartCoroutine(_uiCardManager.Choose(selected));
+                StartCoroutine(_uiCardManager.Choose(selected, false));
                 while (!Input.GetKeyUp(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
                     yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
@@ -373,12 +379,12 @@ namespace UI
             {
                 StartCoroutine(_dialogueManager.KeineAppear("| || || |-"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 _dialogueManager.ChangeOtherTalking(new Who("Dai"));
                 StartCoroutine(_dialogueManager.OtherAppear("Is this loss?"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -389,11 +395,11 @@ namespace UI
                 _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
                 StartCoroutine(_dialogueManager.OtherAppear("I like spaghetti code!"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 StartCoroutine(_dialogueManager.KeineAppear("Please don't do this here."));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -403,12 +409,12 @@ namespace UI
             {
                 StartCoroutine(_dialogueManager.KeineAppear("ahoj!"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
                 StartCoroutine(_dialogueManager.OtherAppear("ohayou (and not oha 24)"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());

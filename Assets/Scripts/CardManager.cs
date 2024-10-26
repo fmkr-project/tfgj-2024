@@ -9,10 +9,17 @@ public static class CardManager
     public static List<InnerCard> Inner;
     public static List<OuterCard> Outer;
 
+    private static Dictionary<Card, bool> UnlockStatus = new();
+
     public static void LoadCards()
     {
         Inner = CardLoader.LoadInnerCards();
         Outer = CardLoader.LoadOuterCards();
+        
+        foreach (var inner in Inner)
+            UnlockStatus.Add(inner, false);
+        foreach (var outer in Outer)
+            UnlockStatus.Add(outer, false);
     }
 
     public static InnerCard PullInner()
@@ -61,5 +68,15 @@ public static class CardManager
     public static int GetOuterCount()
     {
         return Outer.Count;
+    }
+
+    public static bool CardIsUnlocked(Card c)
+    {
+        return UnlockStatus[c];
+    }
+
+    public static void Unlock(Card c)
+    {
+        UnlockStatus[c] = true;
     }
 }

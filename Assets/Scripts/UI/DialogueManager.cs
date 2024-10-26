@@ -13,13 +13,15 @@ namespace UI
         private DialogueBox _keineBox;
         private DialogueBox _otherBox;
 
-        private void Start()
+        private void Awake()
         {
             _keineBox = keineBoxPrefab.GetComponent<DialogueBox>();
-            _keineBox.ChangeWhoSpeaks(new Who("Keine"));
-            _keineBox.gameObject.SetActive(false);
-            
             _otherBox = otherBoxPrefab.GetComponent<DialogueBox>();
+        }
+
+        private void Start()
+        {
+            _keineBox.gameObject.SetActive(false);
             _otherBox.gameObject.SetActive(false);
         }
 
@@ -30,6 +32,7 @@ namespace UI
 
         public IEnumerator KeineAppear(string text)
         {
+            _keineBox.ChangeWhoSpeaks(new Who("Keine")); // Not very efficient
             _keineBox.gameObject.SetActive(true);
             _keineBox.ChangeDialogue(text);
             StartCoroutine(_keineBox.Appear(AnimationDirection.Left));
