@@ -72,6 +72,10 @@ namespace UI
                     StartCoroutine(_collectionMenu.Hide());
                     _isCollectionMenuOpen = false;
                 }
+                if (Input.GetKeyDown(KeyCode.A))
+                    _collectionMenu.PreviousPage();
+                if (Input.GetKeyDown(KeyCode.D))
+                    _collectionMenu.NextPage();
                 if (Input.GetKeyDown(KeyCode.W))
                     _collectionMenu.MoveArrowUp();
                 if (Input.GetKeyDown(KeyCode.S))

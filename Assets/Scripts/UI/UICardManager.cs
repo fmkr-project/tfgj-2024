@@ -107,6 +107,8 @@ namespace UI
             // Animate a circle (ok) or a cross (no) depending on the answer.
 
             lastWasCorrect = isCorrect;
+            // Play a sound.
+            SoundManager.Fire(isCorrect ? "ok" : "no");
             
             // Two smoothersteps.
             _answerResultImage.sprite =

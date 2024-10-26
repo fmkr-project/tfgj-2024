@@ -77,7 +77,7 @@ public class Game : MonoBehaviour
         var rerolls = 0;
         // There should always be at least 8 cards for each inner and for each difficulty.
         // Safeguard just in case.
-        while (outer is null && rerolls < CardManager.GetInnerCount())
+        while (outer is null && rerolls < 4 * CardManager.GetInnerCount())
         {
             try
             {

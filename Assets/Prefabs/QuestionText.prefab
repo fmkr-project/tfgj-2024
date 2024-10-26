@@ -212,7 +212,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: Lorem ipsum dolor sit amet?
+  m_text: What happened <u>first</u> in Gensokyo?
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: ad475e48e300edc428e8324d4d9f3eb2, type: 2}
   m_sharedMaterial: {fileID: 1064791344561192344, guid: ad475e48e300edc428e8324d4d9f3eb2, type: 2}
@@ -221,8 +221,8 @@ MonoBehaviour:
   m_fontMaterials: []
   m_fontColor32:
     serializedVersion: 2
-    rgba: 4284703587
-  m_fontColor: {r: 0.3886792, g: 0.3886792, b: 0.3886792, a: 1}
+    rgba: 4294967295
+  m_fontColor: {r: 1, g: 1, b: 1, a: 1}
   m_enableVertexGradient: 0
   m_colorMode: 3
   m_fontColorGradient:

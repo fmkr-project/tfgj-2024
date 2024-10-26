@@ -1040,6 +1040,7 @@ MonoBehaviour:
   textField3: {fileID: 1176736233256996020}
   textField4: {fileID: 5216912693533366565}
   textField5: {fileID: 308932584232275010}
+  isReady: 0
 --- !u!1 &2734578159977466469
 GameObject:
   m_ObjectHideFlags: 0

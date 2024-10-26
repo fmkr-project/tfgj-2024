@@ -13,7 +13,8 @@ public record Card
     public string GetImageUrl()
     {
         // Images should be saved in Resources as .png images and should adopt snake_case.
-        return String.Join("", ShortTitle.ToSnakeCase().Split(' '));
+        //return String.Join("", ShortTitle.ToSnakeCase().Split(' '));
+        return ShortTitle.ToUrl();
     }
 
     public static bool CompareYear(InnerCard inner, OuterCard outer)

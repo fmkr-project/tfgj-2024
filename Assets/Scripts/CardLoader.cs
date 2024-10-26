@@ -50,7 +50,6 @@ public static class CardLoader
             
             var year = int.Parse(values[0]);
             var shortTitle = values[1];
-            Debug.Log(shortTitle);
             var tag = values[2] switch
             {
                 "event" => CardTag.Event,

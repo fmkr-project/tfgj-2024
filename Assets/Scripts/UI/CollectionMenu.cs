@@ -213,6 +213,29 @@ namespace UI
             UpdateArrowTexture();
         }
 
+        public void PreviousPage()
+        {
+            if (_firstDisplayed >= 5)
+            {
+                _firstDisplayed -= 5;
+                _arrowPosition = 0;
+                _displayedCards.Clear();
+                ShowFrom(_firstDisplayed);
+            }
+        }
+        
+        public void NextPage()
+        {
+            if ((_firstDisplayed < CardManager.Inner.Count - 5 && _displayedSide == CollectionSide.Inner) ||
+                (_firstDisplayed < CardManager.Outer.Count - 5 && _displayedSide == CollectionSide.Outer))
+            {
+                _firstDisplayed += 5;
+                _arrowPosition = 0;
+                _displayedCards.Clear();
+                ShowFrom(_firstDisplayed);
+            }
+        }
+
         public void SwitchSide(CollectionSide cs)
         {
             _displayedSide = cs;
@@ -232,10 +255,31 @@ namespace UI
         {
             var isUnlocked = CardManager.CardIsUnlocked(reference);
             
+            // Update card color
+            var bg = transform.Find("Canvas/Card").GetComponent<Image>();
+            if (!isUnlocked)
+                bg.color = new Color(0.7f, 0.7f, 0.7f);
+            else
+            {
+                if (reference is InnerCard)
+                    bg.color = new Color(0.8f, 0.5f, 0.5f);
+                else
+                    bg.color = ((OuterCard) reference).Tag switch
+                    {
+                        CardTag.Event => new Color(0.7f, 0.7f, 0.9f),
+                        CardTag.People => new Color(1f, 0.8f, 0.6f),
+                        CardTag.Place => new Color(0.7f, 1f, 0.75f),
+                        CardTag.Tech => new Color(0.55f, 0.55f, 0.8f),
+                        CardTag.DeadTech => new Color(0.55f, 0.55f, 0.55f)
+                    };
+            }
+            
             // Update image
             transform.Find("Canvas/Card/Image").GetComponent<Image>().sprite =
-                Resources.Load<Sprite>(Resources.Load<Sprite>(reference.GetImageUrl()) is not null && isUnlocked
-                    ? reference.GetImageUrl()
+                Resources.Load<Sprite>(isUnlocked
+                    ? (Resources.Load<Sprite>(reference.GetImageUrl()) is not null 
+                        ? reference.GetImageUrl()
+                        : "image_not_found")
                     : "unknown_card");
             
             // Update title

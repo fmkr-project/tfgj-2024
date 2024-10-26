@@ -15,11 +15,20 @@ public static class CardManager
     {
         Inner = CardLoader.LoadInnerCards();
         Outer = CardLoader.LoadOuterCards();
-        
+
         foreach (var inner in Inner)
+        {
             UnlockStatus.Add(inner, false);
+            Debug.Log(inner.ShortTitle);
+            Debug.Log(inner.GetImageUrl());
+        }
+
         foreach (var outer in Outer)
+        {
             UnlockStatus.Add(outer, false);
+            Debug.Log(outer.ShortTitle);
+            Debug.Log(outer.GetImageUrl());
+        }
     }
 
     public static InnerCard PullInner()

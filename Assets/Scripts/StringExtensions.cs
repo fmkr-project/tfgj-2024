@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Text;
 
 public static class StringExtensions
@@ -25,5 +26,17 @@ public static class StringExtensions
             }
         }
         return sb.ToString();
+    }
+
+    public static string ToUrl(this string text)
+    {
+        if (text == null) throw new ArgumentNullException(nameof(text));
+
+        return text
+            .Aggregate("", (current, c) => current + (c is ' '
+                ? '_'
+                : c is '\''
+                    ? ""
+                    : c.ToString().ToLowerInvariant()));
     }
 }
