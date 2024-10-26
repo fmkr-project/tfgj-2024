@@ -13,6 +13,8 @@ namespace UI
     
     public class UICardManager : MonoBehaviour
     {
+        public bool lastWasCorrect = true;
+        
         [SerializeField] private GameObject innerObject;
         [SerializeField] private GameObject outerObject;
         [SerializeField] private GameObject questionObject;
@@ -96,6 +98,9 @@ namespace UI
         private IEnumerator AnswerAnimation(bool isCorrect)
         {
             // Animate a circle (ok) or a cross (no) depending on the answer.
+
+            lastWasCorrect = isCorrect;
+            
             // Two smoothersteps.
             _answerResultImage.sprite =
                 isCorrect ? Resources.Load<Sprite>("ok") : Resources.Load<Sprite>("no");

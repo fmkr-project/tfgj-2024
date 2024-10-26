@@ -71,6 +71,36 @@ namespace UI
             }
         }
 
+        public void DiscreteChangeMenuState(MenuState newState)
+        {
+            // Same as ChangeMenuState, but does not animate the boxes.
+            
+            if (menuState == newState) return;
+
+            if (newState == MenuState.DiffMenu)
+            {
+                menuState = MenuState.DiffMenu;
+                // All items stay hidden
+                // Relevant items have their text changed
+                for (var i = GetMainMenuItemCount() - GetDiffMenuItemCount(); i < GetMainMenuItemCount(); i++)
+                {
+                    var corrected = i - GetMainMenuItemCount() + GetDiffMenuItemCount();
+                    _menuItems[i].SetLabel(_diffMenuItemNames[corrected]);
+                }
+            }
+
+            if (newState == MenuState.MainMenu)
+            {
+                menuState = MenuState.MainMenu;
+                // Do nothing with hidden items
+                // For already shown items, hide them and change their text
+                for (var i = GetMainMenuItemCount() - GetDiffMenuItemCount(); i < GetMainMenuItemCount(); i++)
+                {
+                    _menuItems[i].SetLabel(_mainMenuItemNames[i]);
+                }
+            }
+        }
+
         private void MakeNewMenuItem(string menuItemName, int limit)
         {
             var newObject = Instantiate(menuItemPrefab, transform);
@@ -106,8 +136,8 @@ namespace UI
 
         public IEnumerator HideAllItems()
         {
-            foreach (var item in _menuItems)
-                StartCoroutine(item.Hide());
+            for (var i = menuState == MenuState.DiffMenu ? 1 : 0; i < _menuItems.Count; i++)
+                StartCoroutine(_menuItems[i].Hide());
             yield return null;
         }
 

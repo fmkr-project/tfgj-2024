@@ -7,9 +7,10 @@ namespace UI
 {
     public class MainMenuScreen : MonoBehaviour
     {
-        public UnityEvent callTutorialTurn1;
-        public UnityEvent callTutorialTurn2;
-        public UnityEvent callNextTurn;
+        public UnityEvent callTutorialTurn1; // For tutorial
+        public UnityEvent callTutorialTurn2; // For tutorial
+        public UnityEvent callNextTurn; // Tell Game to update the cards using CardManager
+        public UnityEvent callGame; // Tell Game to look for the selected difficulty
         
         private Arrow _arrow;
         private MenuItemList _menuItemList;
@@ -17,6 +18,11 @@ namespace UI
         
         private DialogueManager _dialogueManager;
         private UICardManager _uiCardManager;
+        private CollectionMenu _collectionMenu;
+        private bool _isCollectionMenuOpen;
+
+        public GameDifficulty selectedDifficulty;
+        public int turnNumber;
 
         private InnerCard _inner;
         private OuterCard _outer;
@@ -29,6 +35,7 @@ namespace UI
             callTutorialTurn1 = new UnityEvent();
             callTutorialTurn2 = new UnityEvent();
             callNextTurn = new UnityEvent();
+            callGame = new UnityEvent();
             
             _arrow = GetComponentInChildren<Arrow>();
             _menuItemList = GetComponentInChildren<MenuItemList>();
@@ -45,6 +52,7 @@ namespace UI
 
             _dialogueManager = GetComponentInChildren<DialogueManager>();
             _uiCardManager = GetComponentInChildren<UICardManager>();
+            _collectionMenu = GetComponentInChildren<CollectionMenu>();
         }
 
         private void Start()
@@ -54,6 +62,22 @@ namespace UI
 
         private void Update()
         {
+            // Controls in the collection menu
+            if (_isCollectionMenuOpen)
+            {
+                if (Input.GetKeyDown(KeyCode.Escape))
+                {
+                    StartCoroutine(_collectionMenu.Hide());
+                    _isCollectionMenuOpen = false;
+                }
+                if (Input.GetKeyDown(KeyCode.W))
+                    _collectionMenu.MoveArrowUp();
+                if (Input.GetKeyDown(KeyCode.S))
+                    _collectionMenu.MoveArrowDown();
+
+                return;
+            }
+            
             // Arrow controls
             if (Input.GetKeyDown(KeyCode.W) && !_isInGame)
                 _arrow.MoveUp();
@@ -72,7 +96,6 @@ namespace UI
                     {
                         case "Tutorial":
                             StartCoroutine(StartTutorial());
-                            _isInGame = true;
                             break;
                         case "Play!":
                             StartCoroutine(_menuItemList.ChangeMenuState(MenuState.DiffMenu));
@@ -80,16 +103,33 @@ namespace UI
                             _arrow.position = 0;
                             _arrow.UpdateAnchors();
                             break;
+                        case "Collection":
+                            _isCollectionMenuOpen = true;
+                            _collectionMenu.ShowFrom(0);
+                            StartCoroutine(_collectionMenu.Show());
+                            break;
                         default:
                             Debug.Log("TODO");
                             break;
                     } 
                 }
 
-                if (_menuItemList.menuState == MenuState.DiffMenu)
+                else if (_menuItemList.menuState == MenuState.DiffMenu)
                 {
                     switch (_menuItemList.GetTextUnderArrow(_arrow.position))
                     {
+                        case "Easy":
+                            selectedDifficulty = GameDifficulty.Easy;
+                            StartCoroutine(StartGame());
+                            break;
+                        case "Less easy":
+                            selectedDifficulty = GameDifficulty.LessEasy;
+                            StartCoroutine(StartGame());
+                            break;
+                        case "Akyuu":
+                            selectedDifficulty = GameDifficulty.Akyuu;
+                            StartCoroutine(StartGame());
+                            break;
                         case "Back!":
                             StartCoroutine(_menuItemList.ChangeMenuState(MenuState.MainMenu));
                             _arrow.maxPosition = _menuItemList.GetMainMenuItemCount();
@@ -107,6 +147,7 @@ namespace UI
         private IEnumerator StartTutorial()
         {
             _arrow.Hide();
+            _isInGame = true;
             StartCoroutine(_menuItemList.HideAllItems());
             yield return new WaitForSeconds(0.25f);
 
@@ -242,11 +283,162 @@ namespace UI
             yield return null;
         }
 
+        private IEnumerator StartGame()
+        {
+            _arrow.Hide();
+            _isInGame = true;
+            turnNumber = 0;
+            StartCoroutine(_menuItemList.HideAllItems());
+            yield return new WaitForSeconds(0.25f);
+            
+            callGame.Invoke();
+            
+            // TODO Prepare a different dialogue for all 3 difficulties.
+            
+            // Introduction dialogues.
+            // TODO maybe different introduction dialogues in the same difficulty.
+            if (selectedDifficulty == GameDifficulty.Easy)
+            {
+                StartCoroutine(_dialogueManager.KeineAppear("njut njut njut njut njut njut njut njut njut"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                _dialogueManager.ChangeOtherTalking(new Who("Rumia"));
+                StartCoroutine(_dialogueManager.OtherAppear("*insert Polish noises*"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            else if (selectedDifficulty == GameDifficulty.LessEasy)
+            {
+                _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                StartCoroutine(_dialogueManager.OtherAppear("Speech order can be inverted! Although it's not particularly elegant."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                StartCoroutine(_dialogueManager.KeineAppear("yeah"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            else
+            {
+                StartCoroutine(_dialogueManager.KeineAppear("hej"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
+                StartCoroutine(_dialogueManager.OtherAppear("ayo"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            
+            // Game loop.
+            // Keep playing until the player either gets an X or finishes 6 cards.
+            // Randomly introduce some ambience dialogue.
+            while (_uiCardManager.lastWasCorrect && turnNumber < 6)
+            {
+                callNextTurn.Invoke();
+                
+                StartCoroutine(_uiCardManager.ShowCards());
+                yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+                
+                // Wait for player input.
+                while (!Input.GetKeyDown(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
+                    yield return new WaitForSeconds(Time.deltaTime);
+                var selected = Input.GetKeyDown(KeyCode.W) ? Selected.Up : Selected.Down;
+                StartCoroutine(_uiCardManager.Choose(selected));
+                while (!Input.GetKeyUp(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
+                    yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
+                
+                StartCoroutine(_uiCardManager.HideCards());
+                yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+                turnNumber++;
+            }
+            
+            // End dialogue.
+            // Separate player win and player loss.
+            if (selectedDifficulty == GameDifficulty.Easy)
+            {
+                StartCoroutine(_dialogueManager.KeineAppear("| || || |-"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                _dialogueManager.ChangeOtherTalking(new Who("Dai"));
+                StartCoroutine(_dialogueManager.OtherAppear("Is this loss?"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            else if (selectedDifficulty == GameDifficulty.LessEasy)
+            {
+                _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                StartCoroutine(_dialogueManager.OtherAppear("I like spaghetti code!"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                StartCoroutine(_dialogueManager.KeineAppear("Please don't do this here."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            else
+            {
+                StartCoroutine(_dialogueManager.KeineAppear("ahoj!"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                StartCoroutine(_dialogueManager.OtherAppear("ohayou (and not oha 24)"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                while (!Input.GetKeyUp(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+
+                StartCoroutine(_dialogueManager.KeineRetire());
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            }
+            
+            // Return to the main menu. Change items to their main menu counterpart (we were in diff).
+            _arrow.Show();
+            _menuItemList.DiscreteChangeMenuState(MenuState.MainMenu);
+            _arrow.maxPosition = _menuItemList.GetMainMenuItemCount();
+            _arrow.position = 0;
+            _arrow.UpdateAnchors();
+            StartCoroutine(_menuItemList.ShowAllItems());
+
+            _uiCardManager.lastWasCorrect = true;
+            _isInGame = false;
+            
+            yield return null;
+        }
+
         public void UpdateCardDisplay(InnerCard inner, OuterCard outer)
         {
             _inner = inner;
             _outer = outer;
             _uiCardManager.UpdateCards(inner, outer);
+        }
+
+        private Selected SelectedOfInput(KeyCode keyCode)
+        {
+            return keyCode == KeyCode.W ? Selected.Up : Selected.Down;
         }
     }
 }
