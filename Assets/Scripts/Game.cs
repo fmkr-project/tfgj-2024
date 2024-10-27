@@ -1,5 +1,8 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using Newtonsoft.Json;
 using UI;
 using UnityEngine;
 
@@ -12,11 +15,191 @@ public class Game : MonoBehaviour
 
     private List<OuterCard> _pool;
     
+    // Save related
+    private string pathDir;
+
+    public void SaveData()
+    {
+        var iProgPath = Path.Combine(pathDir, "ip.json");
+        var progPath = Path.Combine(pathDir, "p.json");
+        var unPath = Path.Combine(pathDir, "u.json");
+        var oUnPath = Path.Combine(pathDir, "ou.json");
+        try
+        {
+            Directory.CreateDirectory(pathDir);
+            var p = JsonConvert.SerializeObject(CardManager.SaveP(), Formatting.Indented);
+            var u = JsonConvert.SerializeObject(CardManager.SaveU(), Formatting.Indented);
+            using var uf = new FileStream(unPath, FileMode.Create);
+            using var pf = new FileStream(progPath, FileMode.Create);
+            using var uw = new StreamWriter(uf);
+            using var pw = new StreamWriter(pf);
+            uw.Write(u);
+            pw.Write(p);
+            /*
+            var iprog = JsonConvert.SerializeObject(CardManager.SaveInnerProgress());
+            var oprog = JsonConvert.SerializeObject(CardManager.SaveOuterProgress());
+            Debug.Log(iprog);
+            var iunlock = JsonConvert.SerializeObject(CardManager.SaveInnerUnlocks());
+            var ounlock = JsonConvert.SerializeObject(CardManager.SaveOuterUnlocks());
+            using FileStream ipfs = new FileStream(iProgPath, FileMode.Create);
+            using StreamWriter ipsw = new StreamWriter(ipfs);
+            using FileStream iufs = new FileStream(iUnPath, FileMode.Create);
+            using StreamWriter iusw = new StreamWriter(iufs);
+            using FileStream opfs = new FileStream(oProgPath, FileMode.Create);
+            using StreamWriter opsw = new StreamWriter(opfs);
+            using FileStream oufs = new FileStream(oUnPath, FileMode.Create);
+            using StreamWriter ousw = new StreamWriter(oufs);
+            ipsw.Write(iprog);
+            iusw.Write(iunlock);
+            opsw.Write(oprog);
+            ousw.Write(ounlock);*/
+        }
+        catch (Exception e)
+        {
+            print("todo");
+            throw;
+        }
+    }
+
+    private void OnApplicationQuit()
+    {
+        SaveData();
+    }
+
+    public void LoadData()
+    {
+        var iProgPath = Path.Combine(pathDir, "ip.json");
+        var progPath = Path.Combine(pathDir, "p.json");
+        var unPath = Path.Combine(pathDir, "u.json");
+        var oUnPath = Path.Combine(pathDir, "ou.json");
+
+        Dictionary<string, List<int>> fp = new();
+        Dictionary<string, bool> fu = new();
+
+        if (File.Exists(unPath))
+        {
+            try
+            {
+                var pData = "";
+                using FileStream pfs = new FileStream(unPath, FileMode.Open);
+                using StreamReader psr = new StreamReader(pfs);
+                pData = psr.ReadToEnd();
+                fu = JsonConvert.DeserializeObject<Dictionary<string, bool>>(pData);
+            }
+            catch (Exception e)
+            {
+                print(e);
+                throw;
+            }
+        }
+        
+        if (File.Exists(progPath))
+        {
+            try
+            {
+                var pData = "";
+                using FileStream pfs = new FileStream(progPath, FileMode.Open);
+                using StreamReader psr = new StreamReader(pfs);
+                pData = psr.ReadToEnd();
+                fp = JsonConvert.DeserializeObject<Dictionary<string, List<int>>>(pData);
+            }
+            catch (Exception e)
+            {
+                print(e);
+                throw;
+            }
+        }
+        
+/*
+        if (File.Exists(iProgPath))
+        {
+            try
+            {
+                var pData = "";
+                using FileStream pfs = new FileStream(iProgPath, FileMode.Open);
+                using StreamReader psr = new StreamReader(pfs);
+                pData = psr.ReadToEnd();
+                var temp = JsonConvert.DeserializeObject<Dictionary<string, History>>(pData);
+                print(temp);
+                finalPi = JsonConvert.DeserializeObject<Dictionary<InnerCard, History>>(temp);
+            }
+            catch (Exception e)
+            {
+                print(e);
+                throw;
+            }
+        }
+
+        if (File.Exists(oProgPath))
+        {
+            try
+            {
+                var pData = "";
+                using FileStream pfs = new FileStream(oProgPath, FileMode.Open);
+                using StreamReader psr = new StreamReader(pfs);
+                pData = psr.ReadToEnd();
+                var temp = JsonConvert.DeserializeObject<Dictionary<string, History>>(pData).ToString();
+                finalPo = JsonConvert.DeserializeObject<Dictionary<OuterCard, History>>(temp);
+            }
+            catch (Exception e)
+            {
+                print(e);
+                throw;
+            }
+        }
+        
+        if (File.Exists(iUnPath))
+        {
+            try
+            {
+                var uData = "";
+                using FileStream ufs = new FileStream(iUnPath, FileMode.Open);
+                using StreamReader usr = new StreamReader(ufs);
+                uData = usr.ReadToEnd();
+                var temp = JsonConvert.DeserializeObject<Dictionary<string, bool>>(uData).ToString();
+                finalUi = JsonConvert.DeserializeObject<Dictionary<InnerCard, bool>>(temp);
+            }
+            catch (Exception e)
+            {
+                print("nope");
+                throw;
+            }
+        }
+
+        if (File.Exists(oUnPath))
+        {
+            try
+            {
+                var uData = "";
+                using FileStream ufs = new FileStream(oUnPath, FileMode.Open);
+                using StreamReader usr = new StreamReader(ufs);
+                uData = usr.ReadToEnd();
+                var temp = JsonConvert.DeserializeObject<Dictionary<string, bool>>(uData).ToString();
+                finalUo = JsonConvert.DeserializeObject<Dictionary<OuterCard, bool>>(temp);
+            }
+            catch (Exception e)
+            {
+                print("nope");
+                throw;
+            }
+        }*/
+
+
+        
+        if (fp.Count > 0 && fu.Count > 0)
+        {
+            CardManager.LoadP(fp);
+            CardManager.LoadU(fu);
+        }
+    }
+    
     private void Awake()
     {
+        pathDir = Application.persistentDataPath;
         _mainMenuScreen = transform.Find("/Canvas").GetComponent<MainMenuScreen>();
         
         CardManager.LoadCards();
+        LoadData();
     }
 
     private void Start()
