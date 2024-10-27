@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -46,6 +47,7 @@ namespace UI
         private int _arrowPosition;
 
         public bool isReady;
+        public bool canClose;
 
         private void Awake()
         {
@@ -197,6 +199,7 @@ namespace UI
             }
 
             _displayedCards.Clear();
+            canClose = true;
         }
 
         public void MoveArrowUp()

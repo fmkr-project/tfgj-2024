@@ -83,13 +83,21 @@ namespace UI
             // Controls in the collection menu
             if (_isCollectionMenuOpen)
             {
+                if (_collectionMenu.canClose)
+                {
+                    _isCollectionMenuOpen = false;
+                    _collectionMenu.canClose = false;
+                    return;
+                }
+                
                 if (!_collectionMenu.isReady) return;
                 
                 if (Input.GetKeyDown(KeyCode.Escape))
                 {
                     StartCoroutine(_collectionMenu.Hide());
-                    _isCollectionMenuOpen = false;
+                    _collectionMenu.isReady = false;
                 }
+                
                 if (Input.GetKeyDown(KeyCode.A))
                     _collectionMenu.PreviousPage();
                 if (Input.GetKeyDown(KeyCode.D))
