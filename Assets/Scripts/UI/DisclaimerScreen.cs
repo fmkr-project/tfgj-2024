@@ -16,7 +16,7 @@ namespace UI
             _fader.SetDefaultColor(Color.black);
         
             _disclaimerText = GameObject.Find("DisclaimerText").GetComponent<TextMeshProUGUI>();
-            _disclaimerText.SetText("This is a Touhou Project derivative work.");
+            _disclaimerText.SetText("This is a Touhou Project fan-made derivative work.");
         }
 
         private IEnumerator Start()

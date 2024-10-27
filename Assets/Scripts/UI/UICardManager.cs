@@ -153,7 +153,7 @@ namespace UI
 
         public float AnswerAnimationDuration()
         {
-            return 3 * _answerAnimationDuration;
+            return 4 * _answerAnimationDuration;
         }
     }
 }

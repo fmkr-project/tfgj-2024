@@ -479,45 +479,101 @@ namespace UI
             // TODO maybe different introduction dialogues in the same difficulty.
             if (selectedDifficulty == GameDifficulty.Easy)
             {
-                StartCoroutine(_dialogueManager.KeineAppear("njut njut njut njut njut njut njut njut njut"));
+                StartCoroutine(_dialogueManager.KeineAppear("Morning class!"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
                 
+                _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                StartCoroutine(_dialogueManager.OtherAppear("*is making a paper plane with her biology homework*"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
                 _dialogueManager.ChangeOtherTalking(new Who("Rumia"));
-                StartCoroutine(_dialogueManager.OtherAppear("*insert Polish noises*"));
+                StartCoroutine(_dialogueManager.OtherAppear("*loafs around*"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
                 
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                _dialogueManager.ChangeOtherTalking(new Who("Dai"));
+                StartCoroutine(_dialogueManager.OtherAppear("*seems to be listening Keine, but is actually doing her Maths I homework*"));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+                
+                _dialogueManager.KeineChangeDialogue("Well, here we go again...");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
             }
             else if (selectedDifficulty == GameDifficulty.LessEasy)
             {
-                _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
-                StartCoroutine(_dialogueManager.OtherAppear("Speech order can be inverted! Although it's not particularly elegant."));
+                StartCoroutine(_dialogueManager.KeineAppear("Morning Kosuzu. Do you happen to have the \"Nihon no Rekishi\" series back at Suzunaan? I wanted to check something."));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
 
-                StartCoroutine(_dialogueManager.KeineAppear("yeah"));
+                _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
+                StartCoroutine(_dialogueManager.OtherAppear("Ummm... Don't know. I may be surrounded by books all day, but I can't remember everything I have. Although if you're talking about the Chuo Kouron ones, I might have them until \"Tenka-touitsu\"."));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
-                
+
+                _dialogueManager.OtherChangeDialogue("What's the problem?");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.KeineChangeDialogue("There's a girl in the class called Sara Koiwai... One day, she wanted to talk to me. She talked about things I've never heard before. Takarazuka Kagekidan, someone named Tanaka Kakuei...");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.OtherChangeDialogue("Ummm.. please stop spoiling the end of Tokiana Mimika, would you?");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
             }
             else
             {
-                StartCoroutine(_dialogueManager.KeineAppear("hej"));
+                StartCoroutine(_dialogueManager.KeineAppear("Morning Akyuu."));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
 
+                _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                StartCoroutine(_dialogueManager.OtherAppear("Morning."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.KeineChangeDialogue("So I recently discovered a theorem to estimate when people would start to talk about events happening in the Outside World.");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+
+                _dialogueManager.OtherChangeDialogue("The Keine Theorem. Kosuzu told me about it. Honestly, I don't really know what to expect from this so-called theorem.");
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
                 _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
-                StartCoroutine(_dialogueManager.OtherAppear("ayo"));
+                StartCoroutine(_dialogueManager.OtherAppear("Hey, stop talking about me in the third person, you insisted to bring me here."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+                
+                _dialogueManager.KeineChangeDialogue("Ummm... it was me actually. Sorry for interrupting you during your job, but I requested your expertise to verify some properties of the Theorem.");
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
                 yield return new WaitForSeconds(Time.deltaTime);
 
+                StartCoroutine(_dialogueManager.OtherRetire());
+                yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                StartCoroutine(_dialogueManager.OtherAppear("Go on."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                yield return new WaitForSeconds(Time.deltaTime);
+                
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
@@ -549,14 +605,38 @@ namespace UI
             // Separate player win and player loss.
             if (selectedDifficulty == GameDifficulty.Easy)
             {
-                StartCoroutine(_dialogueManager.KeineAppear("| || || |-"));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
-                
-                _dialogueManager.ChangeOtherTalking(new Who("Dai"));
-                StartCoroutine(_dialogueManager.OtherAppear("Is this loss?"));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
+                if (turnNumber == 6)
+                {
+                    // Win dialogues.
+                    StartCoroutine(_dialogueManager.KeineAppear("Wow, so it seems you aren't as stupid as I thought."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+
+                    _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                    StartCoroutine(_dialogueManager.OtherAppear("It's because even in history I'm the strongest!"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+                else
+                {
+                    // Loss dialogues.
+                    StartCoroutine(_dialogueManager.KeineAppear("*proceeds to bonk Cirno who just launched a paper plane at Keine*"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                    StartCoroutine(_dialogueManager.OtherAppear("| |i || |_"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+
+                    StartCoroutine(_dialogueManager.OtherRetire());
+                    yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Dai"));
+                    StartCoroutine(_dialogueManager.OtherAppear("Is this loss?"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -564,14 +644,36 @@ namespace UI
             }
             else if (selectedDifficulty == GameDifficulty.LessEasy)
             {
-                _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
-                StartCoroutine(_dialogueManager.OtherAppear("I like spaghetti code!"));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
+                if (turnNumber == 6)
+                {
+                    _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
+                    StartCoroutine(_dialogueManager.OtherAppear("If I'm not mistaken, I might also have \"Genroku-jidai\" back at the library."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    StartCoroutine(_dialogueManager.KeineAppear("That's still too far away. It would be appreciated if you had some books from the 19th century, but thanks for the help anyways."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.OtherChangeDialogue("I have some Souseki Natsume if it helps.");
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
 
-                StartCoroutine(_dialogueManager.KeineAppear("Please don't do this here."));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
+                    _dialogueManager.KeineChangeDialogue("Still too old, but I guess the Meiji era is also interesting on its own.");
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+                else
+                {
+                    _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
+                    StartCoroutine(_dialogueManager.OtherAppear("I like spaghetti code!"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+
+                    StartCoroutine(_dialogueManager.KeineAppear("Please don't do this here. Also, what are you even doing here?"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
                 
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
@@ -579,15 +681,49 @@ namespace UI
             }
             else
             {
-                StartCoroutine(_dialogueManager.KeineAppear("ahoj!"));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
+                if (turnNumber == 6)
+                {
+                    StartCoroutine(_dialogueManager.KeineAppear("If you made it here, congrats! Please invent in your mind what could happen next as I'm terrible at creative writing."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                    StartCoroutine(_dialogueManager.OtherAppear("Says the one who pulled a theorem out of nowhere. Let's get things right, you're Kamishirasawa Keine, not Srinivasa Ramanujan."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    StartCoroutine(_dialogueManager.OtherRetire());
+                    yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
+                    StartCoroutine(_dialogueManager.OtherAppear("Hey, I've got some books about him!"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.KeineChangeDialogue("He died during Season 35. Keine Theorem once again saves the day!");
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
 
-                _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
-                StartCoroutine(_dialogueManager.OtherAppear("ohayou (and not oha 24)"));
-                while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
-                yield return new WaitForSeconds(Time.deltaTime);
-
+                    StartCoroutine(_dialogueManager.OtherRetire());
+                    yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                    StartCoroutine(_dialogueManager.OtherAppear("That's more than 100 years ago."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+                
+                else
+                {
+                    _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+                    StartCoroutine(_dialogueManager.OtherAppear("That's what I thought, history and mathematics don't really go well together..."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    StartCoroutine(_dialogueManager.KeineAppear("I think I need to adjust some more variables..."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return new WaitForSeconds(Time.deltaTime);
+                    yield return new WaitForSeconds(Time.deltaTime);
+                }
+                
                 StartCoroutine(_dialogueManager.KeineRetire());
                 StartCoroutine(_dialogueManager.OtherRetire());
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
