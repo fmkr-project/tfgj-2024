@@ -74,7 +74,7 @@ namespace UI
             _outerUI.SetupCard(outer);
         }
 
-        public IEnumerator Choose(Selected what, bool forced)
+        public IEnumerator Choose(Selected what, bool forced, float elapsed)
         {
             switch (what)
             {
@@ -97,9 +97,9 @@ namespace UI
             {
                 // Correct answer.
                 CardManager.Unlock(_inner);
-                _inner.Pass();
+                _inner.Pass(elapsed);
                 CardManager.Unlock(_outer);
-                _outer.Pass();
+                _outer.Pass(elapsed);
             }
             else
             {

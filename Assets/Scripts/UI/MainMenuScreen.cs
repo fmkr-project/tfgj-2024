@@ -317,7 +317,7 @@ namespace UI
             // Wait for player input. The other input (wrong answer) is disabled.
             // Don't use this code for the main loop.
             while (!Input.GetKeyDown(KeyCode.W)) yield return null;
-            StartCoroutine(_uiCardManager.Choose(Selected.Up, true));
+            StartCoroutine(_uiCardManager.Choose(Selected.Up, true, 0));
             
             // Wait for animation to end
             yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
@@ -416,7 +416,7 @@ namespace UI
             // Wait for player input. The other input (wrong answer) is disabled.
             // Again, don't use this code for the main loop.
             while (!Input.GetKeyDown(KeyCode.S)) yield return null;
-            StartCoroutine(_uiCardManager.Choose(Selected.Down, true));
+            StartCoroutine(_uiCardManager.Choose(Selected.Down, true, 0));
             yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
             
             // Cards disappear. Keine.
@@ -491,7 +491,7 @@ namespace UI
                 StartCoroutine(_dialogueManager.OtherRetire());
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
                 _dialogueManager.ChangeOtherTalking(new Who("Rumia"));
-                StartCoroutine(_dialogueManager.OtherAppear("*loafs around*"));
+                StartCoroutine(_dialogueManager.OtherAppear("*snores*"));
                 while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
                 yield return new WaitForSeconds(Time.deltaTime);
                 
@@ -585,7 +585,8 @@ namespace UI
             while (_uiCardManager.lastWasCorrect && turnNumber < 6)
             {
                 callNextTurn.Invoke();
-                
+
+                var st = Time.time;
                 StartCoroutine(_uiCardManager.ShowCards());
                 yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
                 
@@ -593,7 +594,7 @@ namespace UI
                 while (!Input.GetKeyDown(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
                     yield return null;
                 var selected = Input.GetKeyDown(KeyCode.W) ? Selected.Up : Selected.Down;
-                StartCoroutine(_uiCardManager.Choose(selected, false));
+                StartCoroutine(_uiCardManager.Choose(selected, false, Time.time - st));
                 yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
                 
                 StartCoroutine(_uiCardManager.HideCards());
@@ -605,7 +606,7 @@ namespace UI
             // Separate player win and player loss.
             if (selectedDifficulty == GameDifficulty.Easy)
             {
-                if (turnNumber == 6)
+                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
                 {
                     // Win dialogues.
                     StartCoroutine(_dialogueManager.KeineAppear("Wow, so it seems you aren't as stupid as I thought."));
@@ -644,7 +645,7 @@ namespace UI
             }
             else if (selectedDifficulty == GameDifficulty.LessEasy)
             {
-                if (turnNumber == 6)
+                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
                 {
                     _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
                     StartCoroutine(_dialogueManager.OtherAppear("If I'm not mistaken, I might also have \"Genroku-jidai\" back at the library."));
@@ -681,7 +682,7 @@ namespace UI
             }
             else
             {
-                if (turnNumber == 6)
+                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
                 {
                     StartCoroutine(_dialogueManager.KeineAppear("If you made it here, congrats! Please invent in your mind what could happen next as I'm terrible at creative writing."));
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;

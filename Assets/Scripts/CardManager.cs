@@ -12,43 +12,33 @@ public static class CardManager
     private static Dictionary<Card, bool> UnlockStatus = new();
 
     public static Dictionary<Card, History> Progress = new();
+    
+    public static Dictionary<Card, float> Time = new();
 
     // JSON shenanigans.
-    public static void LoadProgress(Dictionary<InnerCard, History> i, Dictionary<OuterCard, History> o)
+    public static Dictionary<string, float> SaveT()
     {
-        foreach (var pair in i)
-        {
-            Progress.Add(pair.Key, pair.Value);
-        }
-
-        foreach (var pair in o)
-        {
-            Progress.Add(pair.Key, pair.Value);
-        }
+        return Time.ToDictionary(pair => pair.Key.ShortTitle, pair => pair.Value);
     }
 
-    public static void LoadUnlocks(Dictionary<InnerCard, bool> i, Dictionary<OuterCard, bool> o)
+    public static void LoadT(Dictionary<string, float> t)
     {
-        foreach (var pair in i)
+        foreach (var pair in t)
         {
-            UnlockStatus.Add(pair.Key, pair.Value);
-        }
-
-        foreach (var pair in o)
-        {
-            UnlockStatus.Add(pair.Key, pair.Value);
+            try
+            {
+                Time.Add(GetCardByName(pair.Key), pair.Value);
+            }
+            catch (ArgumentException)
+            {
+                Time[GetCardByName(pair.Key)] = pair.Value;
+            }
         }
     }
 
     public static Dictionary<string, bool> SaveU()
     {
-        var temp = new Dictionary<string, bool>();
-        foreach (var pair in UnlockStatus)
-        {
-            temp.Add(pair.Key.ShortTitle, pair.Value);
-        }
-
-        return temp;
+        return UnlockStatus.ToDictionary(pair => pair.Key.ShortTitle, pair => pair.Value);
     }
 
     public static void LoadU(Dictionary<string, bool> u)
@@ -70,7 +60,6 @@ public static class CardManager
     {
         foreach (var pair in p)
         {
-            Debug.Log(pair);
             var c = new History
             {
                 Ok = pair.Value[0],
@@ -97,50 +86,6 @@ public static class CardManager
 
         return temp;
     }
-
-    public static Dictionary<InnerCard, bool> SaveInnerUnlocks()
-    {
-        var temp = new Dictionary<InnerCard, bool>();
-        foreach (var pair in UnlockStatus)
-        {
-            if (pair.Key is InnerCard key) temp.Add(key, pair.Value);
-        }
-
-        return temp;
-    }
-    
-    public static Dictionary<OuterCard, bool> SaveOuterUnlocks()
-    {
-        var temp = new Dictionary<OuterCard, bool>();
-        foreach (var pair in UnlockStatus)
-        {
-            if (pair.Key is OuterCard key) temp.Add(key, pair.Value);
-        }
-
-        return temp;
-    }
-
-    public static Dictionary<InnerCard, History> SaveInnerProgress()
-    {
-        var temp = new Dictionary<InnerCard, History>();
-        foreach (var pair in Progress)
-        {
-            if (pair.Key is InnerCard key) temp.Add(key, pair.Value);
-        }
-
-        return temp;
-    }
-    
-    public static Dictionary<OuterCard, History> SaveOuterProgress()
-    {
-        var temp = new Dictionary<OuterCard, History>();
-        foreach (var pair in Progress)
-        {
-            if (pair.Key is OuterCard key) temp.Add(key, pair.Value);
-        }
-
-        return temp;
-    }
     
     public static void LoadCards()
     {
@@ -151,16 +96,14 @@ public static class CardManager
         {
             UnlockStatus.Add(inner, false);
             Progress.Add(inner, new History());
-            Debug.Log(inner.ShortTitle);
-            Debug.Log(inner.GetImageUrl());
+            Time.Add(inner, 0f);
         }
 
         foreach (var outer in Outer)
         {
             UnlockStatus.Add(outer, false);
             Progress.Add(outer, new History());
-            Debug.Log(outer.ShortTitle);
-            Debug.Log(outer.GetImageUrl());
+            Time.Add(outer, 0f);
         }
     }
 
@@ -235,5 +178,15 @@ public static class CardManager
     public static void Unlock(Card c)
     {
         UnlockStatus[c] = true;
+    }
+
+    public static void AddTime(Card c, float t)
+    {
+        Time[c] += t;
+    }
+
+    public static float ReturnAvg(Card c)
+    {
+        return Time[c] / Progress[c].Ok;
     }
 }

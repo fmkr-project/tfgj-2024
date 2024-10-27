@@ -45,12 +45,13 @@ public record Card
         return inner.Year < outer.GetTrueDate();
     }
 
-    public void Pass()
+    public void Pass(float t)
     {
         var temp = CardManager.Progress[this];
         temp.Ok++;
         temp.Seen++;
         CardManager.Progress[this] = temp;
+        CardManager.AddTime(this, t);
     }
 
     public void Fail()

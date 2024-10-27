@@ -23,18 +23,23 @@ public class Game : MonoBehaviour
         var iProgPath = Path.Combine(pathDir, "ip.json");
         var progPath = Path.Combine(pathDir, "p.json");
         var unPath = Path.Combine(pathDir, "u.json");
+        var tiPath = Path.Combine(pathDir, "t.json");
         var oUnPath = Path.Combine(pathDir, "ou.json");
         try
         {
             Directory.CreateDirectory(pathDir);
             var p = JsonConvert.SerializeObject(CardManager.SaveP(), Formatting.Indented);
             var u = JsonConvert.SerializeObject(CardManager.SaveU(), Formatting.Indented);
+            var t = JsonConvert.SerializeObject(CardManager.SaveT(), Formatting.Indented);
             using var uf = new FileStream(unPath, FileMode.Create);
             using var pf = new FileStream(progPath, FileMode.Create);
+            using var tf = new FileStream(tiPath, FileMode.Create);
             using var uw = new StreamWriter(uf);
             using var pw = new StreamWriter(pf);
+            using var tw = new StreamWriter(tf);
             uw.Write(u);
             pw.Write(p);
+            tw.Write(t);
             /*
             var iprog = JsonConvert.SerializeObject(CardManager.SaveInnerProgress());
             var oprog = JsonConvert.SerializeObject(CardManager.SaveOuterProgress());
@@ -71,10 +76,12 @@ public class Game : MonoBehaviour
         var iProgPath = Path.Combine(pathDir, "ip.json");
         var progPath = Path.Combine(pathDir, "p.json");
         var unPath = Path.Combine(pathDir, "u.json");
+        var tiPath = Path.Combine(pathDir, "t.json");
         var oUnPath = Path.Combine(pathDir, "ou.json");
 
         Dictionary<string, List<int>> fp = new();
         Dictionary<string, bool> fu = new();
+        Dictionary<string, float> ft = new();
 
         if (File.Exists(unPath))
         {
@@ -110,6 +117,22 @@ public class Game : MonoBehaviour
             }
         }
         
+        if (File.Exists(tiPath))
+        {
+            try
+            {
+                var pData = "";
+                using FileStream pfs = new FileStream(tiPath, FileMode.Open);
+                using StreamReader psr = new StreamReader(pfs);
+                pData = psr.ReadToEnd();
+                ft = JsonConvert.DeserializeObject<Dictionary<string, float>>(pData);
+            }
+            catch (Exception e)
+            {
+                print(e);
+                throw;
+            }
+        }
 /*
         if (File.Exists(iProgPath))
         {
@@ -190,6 +213,7 @@ public class Game : MonoBehaviour
         {
             CardManager.LoadP(fp);
             CardManager.LoadU(fu);
+            CardManager.LoadT(ft);
         }
     }
     
