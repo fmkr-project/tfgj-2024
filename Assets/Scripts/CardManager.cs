@@ -11,6 +11,8 @@ public static class CardManager
 
     private static Dictionary<Card, bool> UnlockStatus = new();
 
+    public static Dictionary<Card, History> Progress = new();
+
     public static void LoadCards()
     {
         Inner = CardLoader.LoadInnerCards();
@@ -19,6 +21,7 @@ public static class CardManager
         foreach (var inner in Inner)
         {
             UnlockStatus.Add(inner, false);
+            Progress.Add(inner, new History());
             Debug.Log(inner.ShortTitle);
             Debug.Log(inner.GetImageUrl());
         }
@@ -26,6 +29,7 @@ public static class CardManager
         foreach (var outer in Outer)
         {
             UnlockStatus.Add(outer, false);
+            Progress.Add(outer, new History());
             Debug.Log(outer.ShortTitle);
             Debug.Log(outer.GetImageUrl());
         }

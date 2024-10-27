@@ -48,6 +48,7 @@ namespace UI
             StartCoroutine(_innerUI.Show(CardRotationDirection.Down));
             StartCoroutine(_outerUI.Show(CardRotationDirection.Up));
             StartCoroutine(_question.Show(CardRotationDirection.Up));
+            SoundManager.Fire("card");
             yield return null;
         }
 
@@ -90,13 +91,20 @@ namespace UI
                 ? AnswerAnimation(what == Selected.Down)
                 : AnswerAnimation(what == Selected.Up));
 
-            // TODO UnityEvent with Game
             if (forced) yield break;
             if ((Card.CompareYear(_inner, _outer) && what == Selected.Down) ||
                 (!Card.CompareYear(_inner, _outer) && what == Selected.Up))
             {
+                // Correct answer.
                 CardManager.Unlock(_inner);
+                _inner.Pass();
                 CardManager.Unlock(_outer);
+                _outer.Pass();
+            }
+            else
+            {
+                _inner.Fail();
+                _outer.Fail();
             }
 
             yield return null;

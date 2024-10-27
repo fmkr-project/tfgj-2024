@@ -37,6 +37,8 @@ namespace UI
         private Vector3 _bgStartPosition;
         private RectTransform _cardRectTransform;
         private Vector3 _cardStartPosition;
+        private RectTransform _whereRectTransform;
+        private Vector3 _whereStartPosition;
 
         private CollectionSide _displayedSide = CollectionSide.Inner;
         private int _firstDisplayed;
@@ -57,6 +59,9 @@ namespace UI
             _arrowRectTransform = transform.Find("Canvas/Arrow").GetComponent<RectTransform>();
             _arrowStartPosition = _arrowRectTransform.localPosition;
             _arrowRectTransform.localPosition -= _animationOffset * Vector3.down;
+            _whereRectTransform = transform.Find("Canvas/Where").GetComponent<RectTransform>();
+            _whereStartPosition = _whereRectTransform.localPosition;
+            _whereRectTransform.localPosition -= _animationOffset * Vector3.down;
             
             _arrowStartAnchorMin = _arrowRectTransform.anchorMin;
             _arrowStartAnchorMax = _arrowRectTransform.anchorMax;
@@ -119,12 +124,18 @@ namespace UI
             }
             
             UpdateCard(_displayedCards[_arrowPosition]);
+            
+            transform.Find("Canvas/Where/Text").GetComponent<TextMeshProUGUI>().SetText(
+                _displayedSide == CollectionSide.Inner 
+                    ? "Inside the Barrier"
+                    : "Outside the Barrier");
         }
 
         public IEnumerator Show()
         {
             _arrowPosition = 0;
             UpdateArrowTexture();
+            UpdateCard(_displayedCards[_arrowPosition]);
             
             var elapsed = 0f;
 
@@ -145,6 +156,10 @@ namespace UI
                 _cardRectTransform.localPosition = Vector3.Lerp(
                     _cardStartPosition + _animationOffset * Vector3.down,
                     _cardStartPosition,
+                    (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
+                _whereRectTransform.localPosition = Vector3.Lerp(
+                    _whereStartPosition + _animationOffset * Vector3.down,
+                    _whereStartPosition,
                     (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
                 yield return new WaitForSeconds(deltaTime);
             }
@@ -174,11 +189,14 @@ namespace UI
                     _cardStartPosition,
                     _cardStartPosition + _animationOffset * Vector3.down,
                     (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
+                _whereRectTransform.localPosition = Vector3.Lerp(
+                    _whereStartPosition,
+                    _whereStartPosition + _animationOffset * Vector3.down,
+                    (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
                 yield return new WaitForSeconds(deltaTime);
             }
 
             _displayedCards.Clear();
-            _arrowPosition = 0;
         }
 
         public void MoveArrowUp()
@@ -189,9 +207,14 @@ namespace UI
                 _firstDisplayed -= 5;
                 _arrowPosition = 4;
                 _displayedCards.Clear();
+                SoundManager.Fire("page");
                 ShowFrom(_firstDisplayed);
             }
-            else _arrowPosition = Math.Clamp(_arrowPosition - 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+            else
+            {
+                _arrowPosition = Math.Clamp(_arrowPosition - 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+                SoundManager.Fire("tick");
+            }
             UpdateCard(_displayedCards[_arrowPosition]);
             UpdateArrowTexture();
         }
@@ -206,9 +229,14 @@ namespace UI
                 _firstDisplayed += 5;
                 _arrowPosition = 0;
                 _displayedCards.Clear();
+                SoundManager.Fire("page");
                 ShowFrom(_firstDisplayed);
             }
-            else _arrowPosition = Math.Clamp(_arrowPosition + 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+            else
+            {
+                _arrowPosition = Math.Clamp(_arrowPosition + 1, 0, Math.Min(_displayedCards.Count, 5) - 1);
+                SoundManager.Fire("tick");
+            }
             UpdateCard(_displayedCards[_arrowPosition]);
             UpdateArrowTexture();
         }
@@ -220,7 +248,9 @@ namespace UI
                 _firstDisplayed -= 5;
                 _arrowPosition = 0;
                 _displayedCards.Clear();
+                SoundManager.Fire("page");
                 ShowFrom(_firstDisplayed);
+                UpdateArrowTexture();
             }
         }
         
@@ -232,7 +262,9 @@ namespace UI
                 _firstDisplayed += 5;
                 _arrowPosition = 0;
                 _displayedCards.Clear();
+                SoundManager.Fire("page");
                 ShowFrom(_firstDisplayed);
+                UpdateArrowTexture();
             }
         }
 
@@ -242,6 +274,7 @@ namespace UI
             _displayedCards.Clear();
             _arrowPosition = 0;
             UpdateArrowTexture();
+            SoundManager.Fire("page");
             ShowFrom(0);
         }
 
@@ -273,6 +306,10 @@ namespace UI
                         CardTag.DeadTech => new Color(0.55f, 0.55f, 0.55f)
                     };
             }
+            
+            // Update history
+            transform.Find("Canvas/Card/History").GetComponent<TextMeshProUGUI>().SetText(
+                isUnlocked ? $"History: {CardManager.Progress[reference].Ok}/{CardManager.Progress[reference].Seen}" : "");
             
             // Update image
             transform.Find("Canvas/Card/Image").GetComponent<Image>().sprite =
