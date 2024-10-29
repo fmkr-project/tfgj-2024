@@ -23,6 +23,8 @@ namespace UI
         private bool _isCollectionMenuOpen;
         private CreditsMenu _creditsMenu;
         private bool _isCreditsMenuOpen;
+        
+        private HelperBox _helperBox;
 
         public GameDifficulty selectedDifficulty;
         public int turnNumber;
@@ -57,6 +59,8 @@ namespace UI
             _uiCardManager = GetComponentInChildren<UICardManager>();
             _collectionMenu = GetComponentInChildren<CollectionMenu>();
             _creditsMenu = GetComponentInChildren<CreditsMenu>();
+
+            _helperBox = GetComponentInChildren<HelperBox>();
         }
 
         private void Start()
@@ -445,7 +449,26 @@ namespace UI
             while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
             yield return new WaitForSeconds(Time.deltaTime);
 
-            _dialogueManager.KeineChangeDialogue("Not with the Seal of Approval (tm)!");
+            _dialogueManager.KeineChangeDialogue("Not with the Seal of Approval (tm)! Also, please have this handy reference card.");
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
+            
+            // Card.
+            StartCoroutine(_dialogueManager.KeineRetire());
+            StartCoroutine(_dialogueManager.OtherRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            StartCoroutine(_helperBox.Show());
+            yield return new WaitForSeconds(_helperBox.GetAnimationTime());
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
+            StartCoroutine(_helperBox.Hide());
+            yield return new WaitForSeconds(_helperBox.GetAnimationTime());
+            
+            StartCoroutine(_dialogueManager.OtherAppear("...That's not even decent paper, it's just a Bunbunmaru ad submission form with some notes scribbled on it."));
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
+
+            StartCoroutine(_dialogueManager.KeineAppear("Hey, paper is expensive y'know."));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
             yield return new WaitForSeconds(Time.deltaTime);
 
@@ -579,6 +602,10 @@ namespace UI
                 yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
             }
             
+            // Make the helper card pop first.
+            StartCoroutine(_helperBox.Show());
+            yield return new WaitForSeconds(_helperBox.GetAnimationTime());
+            
             // Game loop.
             // Keep playing until the player either gets an X or finishes 6 cards.
             // Randomly introduce some ambience dialogue.
@@ -615,6 +642,10 @@ namespace UI
                 yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
                 turnNumber++;
             }
+            
+            // Hide the helper card.
+            StartCoroutine(_helperBox.Hide());
+            yield return new WaitForSeconds(_helperBox.GetAnimationTime());
             
             // End dialogue.
             // Separate player win and player loss.
