@@ -85,7 +85,7 @@ namespace UI
 
         public float GetAnimationTime()
         {
-            return _popTime;
+            return 2 * _popTime;
         }
 
         public IEnumerator Push()

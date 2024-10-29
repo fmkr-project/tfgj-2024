@@ -9,6 +9,8 @@ public static class CardManager
     public static List<InnerCard> Inner;
     public static List<OuterCard> Outer;
 
+    private static List<Card> _all = new();
+
     private static Dictionary<Card, bool> UnlockStatus = new();
 
     public static Dictionary<Card, History> Progress = new();
@@ -34,6 +36,14 @@ public static class CardManager
                 Time[GetCardByName(pair.Key)] = pair.Value;
             }
         }
+        
+        // Add cards that didn't exist in the save file.
+        // This allows the game to be played if cards change.
+        // TODO what if cards are removed?
+        foreach (var notFound in _all.Except(t.Keys.Select(GetCardByName)).ToList())
+        {
+            Time[notFound] = 0;
+        }
     }
 
     public static Dictionary<string, bool> SaveU()
@@ -54,6 +64,11 @@ public static class CardManager
                 UnlockStatus[GetCardByName(pair.Key)] = pair.Value;
             }
         }
+        
+        foreach (var notFound in _all.Except(u.Keys.Select(GetCardByName)).ToList())
+        {
+            UnlockStatus[notFound] = false;
+        }
     }
 
     public static void LoadP(Dictionary<string, List<int>> p)
@@ -73,6 +88,15 @@ public static class CardManager
             {
                 Progress[GetCardByName(pair.Key)] = c;
             }
+        }
+        
+        foreach (var notFound in _all.Except(p.Keys.Select(GetCardByName)).ToList())
+        {
+            Progress[notFound] = new History
+            {
+                Ok = 0,
+                Seen = 0
+            };
         }
     }
 
@@ -97,6 +121,8 @@ public static class CardManager
             UnlockStatus.Add(inner, false);
             Progress.Add(inner, new History());
             Time.Add(inner, 0f);
+
+            _all.Add(inner);
         }
 
         foreach (var outer in Outer)
@@ -104,6 +130,8 @@ public static class CardManager
             UnlockStatus.Add(outer, false);
             Progress.Add(outer, new History());
             Time.Add(outer, 0f);
+            
+            _all.Add(outer);
         }
     }
 

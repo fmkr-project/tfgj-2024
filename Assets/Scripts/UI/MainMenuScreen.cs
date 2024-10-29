@@ -324,7 +324,7 @@ namespace UI
             
             // Cards disappear, Keine pops.
             StartCoroutine(_uiCardManager.HideCards());
-            StartCoroutine(_dialogueManager.OtherAppear("If events are forgotten after 15 years, then why does that theorem still work with Marguerite Dumas?"));
+            StartCoroutine(_dialogueManager.OtherAppear("If events are forgotten after 15 years, then why does that theorem still work with Marguerite Duras?"));
             while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
             yield return new WaitForSeconds(Time.deltaTime);
             
@@ -597,6 +597,20 @@ namespace UI
                 StartCoroutine(_uiCardManager.Choose(selected, false, Time.time - st));
                 yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
                 
+                // Blurb when the player answers correctly.
+                if (_uiCardManager.lastWasCorrect)
+                {
+                    if (_outer.GetTrueDate() <= DateTime.Now.Year)
+                        StartCoroutine(_dialogueManager.KeineAppear(
+                            $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it was remembered in {_outer.GetTrueDate()} in Gensokyo.")); 
+                    else StartCoroutine(_dialogueManager.KeineAppear(
+                            $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it will be remembered in {_outer.GetTrueDate()} in Gensokyo."));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    StartCoroutine(_dialogueManager.KeineRetire());
+                }
+                
                 StartCoroutine(_uiCardManager.HideCards());
                 yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
                 turnNumber++;
@@ -615,6 +629,26 @@ namespace UI
 
                     _dialogueManager.ChangeOtherTalking(new Who("Cirno"));
                     StartCoroutine(_dialogueManager.OtherAppear("It's because even in history I'm the strongest!"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    StartCoroutine(_dialogueManager.OtherRetire());
+                    yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+                    
+                    _dialogueManager.ChangeOtherTalking(new Who("Dai"));
+                    StartCoroutine(_dialogueManager.OtherAppear("Sensei, what's a monad?"));
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.KeineChangeDialogue("I see you're still doing some category theory here.");
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                    yield return new WaitForSeconds(Time.deltaTime);
+                    
+                    _dialogueManager.OtherChangeDialogue("Sorry Sensei...");
+                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                    yield return new WaitForSeconds(Time.deltaTime);
+
+                    _dialogueManager.KeineChangeDialogue("No problem, as long as you're working in class. A monad is just a monoid in the category of endofunctors.");
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
                     yield return new WaitForSeconds(Time.deltaTime);
                 }
@@ -708,7 +742,7 @@ namespace UI
                     yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
                     
                     _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
-                    StartCoroutine(_dialogueManager.OtherAppear("That's more than 100 years ago."));
+                    StartCoroutine(_dialogueManager.OtherAppear("That's more than 100 years ago. And I don't think Ramanujan became a no-one in the mathematical world."));
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
                     yield return new WaitForSeconds(Time.deltaTime);
                 }

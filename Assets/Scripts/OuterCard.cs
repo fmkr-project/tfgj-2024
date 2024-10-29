@@ -33,14 +33,20 @@ public record OuterCard : Card
     // Also defines date thresholds.
     {
         var k = Kokunai ? 2 : 1;
+        return Year + GetDelay();
+    }
+
+    public int GetDelay()
+    {
+        var k = Kokunai ? 2 : 1;
         return Tag switch
         {
-            CardTag.Event => Year + k * 15,
-            CardTag.People => Year + k * 25,
-            CardTag.Place => Year + k * 10,
-            CardTag.Tech => Year + 30,
-            CardTag.DeadTech => Year,
-            _ => throw new Exception($"Unknown type when trying to calculate true date for: {ShortTitle}")
+            CardTag.Event => k * 15,
+            CardTag.People => k * 25,
+            CardTag.Place => k * 10,
+            CardTag.Tech => 30,
+            CardTag.DeadTech => 0,
+            _ => throw new Exception($"Unknown type when trying to calculate delay for: {ShortTitle}")
         };
     }
 }
