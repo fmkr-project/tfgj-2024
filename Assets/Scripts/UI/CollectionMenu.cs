@@ -31,6 +31,8 @@ namespace UI
         private float _animationDuration = 0.22f;
         private float _animationOffset = 2200f;
         private float _arrowStep = 0.111f;
+
+        private float _flipDuration = 0.15f;
         
         private List<GameObject> _textFieldList;
 
@@ -271,14 +273,59 @@ namespace UI
             }
         }
 
-        public void SwitchSide(CollectionSide cs)
+        public IEnumerator SwitchSide(CollectionSide cs)
         {
+            if (_displayedSide == cs) yield break;
+
+            isReady = false;
             _displayedSide = cs;
             _displayedCards.Clear();
             _arrowPosition = 0;
             UpdateArrowTexture();
             SoundManager.Fire("page");
+            
+            // Animate menu flip.
+            // No smoothstep here.
+            var elapsed = 0f;
+            while (elapsed < _flipDuration / 2)
+            {
+                var deltaTime = Time.deltaTime;
+                elapsed += deltaTime;
+                _bgRectTransform.rotation = Quaternion.Lerp(
+                    Quaternion.identity,
+                    Quaternion.Euler(0, 90, 0),
+                    2 * elapsed / _flipDuration);
+                _arrowRectTransform.rotation = Quaternion.Lerp(
+                    Quaternion.identity,
+                    Quaternion.Euler(0, 90, 0),
+                    2 * elapsed / _flipDuration);
+                yield return new WaitForSeconds(deltaTime);
+            }
+            
+            // Safeguard + replace text while it is invisible for the player.
+            _bgRectTransform.rotation = Quaternion.Euler(0, -90, 0);
             ShowFrom(0);
+            while (elapsed < _flipDuration)
+            {
+                var deltaTime = Time.deltaTime;
+                elapsed += deltaTime;
+                _bgRectTransform.rotation = Quaternion.Lerp(
+                    Quaternion.Euler(0, -90, 0),
+                    Quaternion.identity,
+                    elapsed / _flipDuration);
+                _arrowRectTransform.rotation = Quaternion.Lerp(
+                    Quaternion.Euler(0, -90, 0),
+                    Quaternion.identity,
+                    elapsed / _flipDuration);
+                yield return new WaitForSeconds(deltaTime);
+            }
+            _bgRectTransform.rotation = Quaternion.identity;
+            isReady = true;
+        }
+
+        public float GetFlipTime()
+	{
+	    return _flipDuration;
         }
 
         private void UpdateArrowTexture()

@@ -111,9 +111,9 @@ namespace UI
                 if (Input.GetKeyDown(KeyCode.S))
                     _collectionMenu.MoveArrowDown();
                 if (Input.GetKeyDown(KeyCode.Q))
-                    _collectionMenu.SwitchSide(CollectionSide.Inner);
+                    StartCoroutine(_collectionMenu.SwitchSide(CollectionSide.Inner));
                 if (Input.GetKeyDown(KeyCode.E))
-                    _collectionMenu.SwitchSide(CollectionSide.Outer);
+                    StartCoroutine(_collectionMenu.SwitchSide(CollectionSide.Outer));
 
                 return;
             }
@@ -445,7 +445,7 @@ namespace UI
             while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
             yield return new WaitForSeconds(Time.deltaTime);
 
-            _dialogueManager.OtherChangeDialogue("...Old!? Well, I think that's a very weird Theorem to begin with.");
+            _dialogueManager.OtherChangeDialogue("...Old!? Well, I think that's a very weird theorem to begin with.");
             while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
             yield return new WaitForSeconds(Time.deltaTime);
 
@@ -717,7 +717,7 @@ namespace UI
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
                     yield return new WaitForSeconds(Time.deltaTime);
                     
-                    StartCoroutine(_dialogueManager.KeineAppear("That's still too far away. It would be appreciated if you had some books from the 19th century, but thanks for the help anyways."));
+                    StartCoroutine(_dialogueManager.KeineAppear("That's still too long ago. It would be appreciated if you had some books from the 19th century, but thanks for the help anyways."));
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
                     yield return new WaitForSeconds(Time.deltaTime);
                     
