@@ -28,9 +28,15 @@ public class Game : MonoBehaviour
         try
         {
             Directory.CreateDirectory(pathDir);
+            
+            // Safeguard against data loss caused by incorrect outer / inner format.
+            if (CardManager.SaveT().Count == 0 || CardManager.SaveP().Count == 0 ||
+                CardManager.SaveU().Count == 0) return;
+                
             var p = JsonConvert.SerializeObject(CardManager.SaveP(), Formatting.Indented);
             var u = JsonConvert.SerializeObject(CardManager.SaveU(), Formatting.Indented);
             var t = JsonConvert.SerializeObject(CardManager.SaveT(), Formatting.Indented);
+            
             using var uf = new FileStream(unPath, FileMode.Create);
             using var pf = new FileStream(progPath, FileMode.Create);
             using var tf = new FileStream(tiPath, FileMode.Create);
@@ -266,15 +272,15 @@ public class Game : MonoBehaviour
     {
         var lowerLim = currentDifficulty switch
         {
-            GameDifficulty.Easy => 10,
-            GameDifficulty.LessEasy => 5,
+            GameDifficulty.Easy => 25,
+            GameDifficulty.LessEasy => 10,
             GameDifficulty.Akyuu => 1,
             _ => throw new ArgumentException("Unknown game difficulty!")
         };
         var upperLim = currentDifficulty switch
         {
             GameDifficulty.Easy => 999,
-            GameDifficulty.LessEasy => 25,
+            GameDifficulty.LessEasy => 35,
             GameDifficulty.Akyuu => 10,
             _ => throw new ArgumentException("Unknown game difficulty!")
         };
