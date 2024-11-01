@@ -28,6 +28,7 @@ namespace UI
 
         public GameDifficulty selectedDifficulty;
         public int turnNumber;
+        public int success;
 
         private InnerCard _inner;
         private OuterCard _outer;
@@ -491,6 +492,7 @@ namespace UI
             StartCoroutine(_arrow.Hide());
             _isInGame = true;
             turnNumber = 0;
+            success = 0;
             StartCoroutine(_menuItemList.HideAllItems());
             yield return new WaitForSeconds(0.25f);
             
@@ -607,9 +609,9 @@ namespace UI
             yield return new WaitForSeconds(_helperBox.GetAnimationTime());
             
             // Game loop.
-            // Keep playing until the player either gets an X or finishes 6 cards.
-            // Randomly introduce some ambience dialogue.
-            while (_uiCardManager.lastWasCorrect && turnNumber < 6)
+            // Keep playing until the player finishes 6 cards.
+            // Randomly introduce some ambience dialogue
+            while (turnNumber < 6)
             {
                 callNextTurn.Invoke();
 
@@ -624,19 +626,17 @@ namespace UI
                 StartCoroutine(_uiCardManager.Choose(selected, false, Time.time - st));
                 yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
                 
-                // Blurb when the player answers correctly.
-                if (_uiCardManager.lastWasCorrect)
-                {
-                    if (_outer.GetTrueDate() <= DateTime.Now.Year)
-                        StartCoroutine(_dialogueManager.KeineAppear(
-                            $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it was remembered in {_outer.GetTrueDate()} in Gensokyo.")); 
-                    else StartCoroutine(_dialogueManager.KeineAppear(
-                            $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it will be remembered in {_outer.GetTrueDate()} in Gensokyo."));
-                    while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
-                    yield return new WaitForSeconds(Time.deltaTime);
-                    
-                    StartCoroutine(_dialogueManager.KeineRetire());
-                }
+                // Blurb.
+                if (_uiCardManager.lastWasCorrect) success++;
+                if (_outer.GetTrueDate() <= DateTime.Now.Year)
+                    StartCoroutine(_dialogueManager.KeineAppear(
+                        $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it was remembered in {_outer.GetTrueDate()} in Gensokyo.")); 
+                else StartCoroutine(_dialogueManager.KeineAppear(
+                        $"In the Outside World, that happened in <b>{_outer.Year}</b>, meaning that it will be remembered in {_outer.GetTrueDate()} in Gensokyo."));
+                while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+                yield return new WaitForSeconds(Time.deltaTime);
+                
+                StartCoroutine(_dialogueManager.KeineRetire());
                 
                 StartCoroutine(_uiCardManager.HideCards());
                 yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
@@ -651,7 +651,7 @@ namespace UI
             // Separate player win and player loss.
             if (selectedDifficulty == GameDifficulty.Easy)
             {
-                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
+                if (turnNumber == success)
                 {
                     // Win dialogues.
                     StartCoroutine(_dialogueManager.KeineAppear("Wow, so it seems you aren't as stupid as I thought."));
@@ -710,7 +710,7 @@ namespace UI
             }
             else if (selectedDifficulty == GameDifficulty.LessEasy)
             {
-                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
+                if (turnNumber == success)
                 {
                     _dialogueManager.ChangeOtherTalking(new Who("Kosuzu"));
                     StartCoroutine(_dialogueManager.OtherAppear("If I'm not mistaken, I might also have \"Genroku-jidai\" back at the library."));
@@ -747,7 +747,7 @@ namespace UI
             }
             else
             {
-                if (turnNumber == 6 && _uiCardManager.lastWasCorrect)
+                if (turnNumber == success)
                 {
                     StartCoroutine(_dialogueManager.KeineAppear("If you made it here, congrats! Please invent in your mind what could happen next as I'm terrible at creative writing."));
                     while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
