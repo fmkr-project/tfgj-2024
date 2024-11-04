@@ -24,6 +24,7 @@ public class Game : MonoBehaviour
         var progPath = Path.Combine(pathDir, "p.json");
         var unPath = Path.Combine(pathDir, "u.json");
         var tiPath = Path.Combine(pathDir, "t.json");
+        var btPath = Path.Combine(pathDir, "b.json");
         var oUnPath = Path.Combine(pathDir, "ou.json");
         try
         {
@@ -36,34 +37,21 @@ public class Game : MonoBehaviour
             var p = JsonConvert.SerializeObject(CardManager.SaveP(), Formatting.Indented);
             var u = JsonConvert.SerializeObject(CardManager.SaveU(), Formatting.Indented);
             var t = JsonConvert.SerializeObject(CardManager.SaveT(), Formatting.Indented);
+            var b = JsonConvert.SerializeObject(CardManager.SaveB(), Formatting.Indented);
             
             using var uf = new FileStream(unPath, FileMode.Create);
             using var pf = new FileStream(progPath, FileMode.Create);
             using var tf = new FileStream(tiPath, FileMode.Create);
+            using var bf = new FileStream(btPath, FileMode.Create);
+            
             using var uw = new StreamWriter(uf);
             using var pw = new StreamWriter(pf);
             using var tw = new StreamWriter(tf);
+            using var bw = new StreamWriter(bf);
             uw.Write(u);
             pw.Write(p);
             tw.Write(t);
-            /*
-            var iprog = JsonConvert.SerializeObject(CardManager.SaveInnerProgress());
-            var oprog = JsonConvert.SerializeObject(CardManager.SaveOuterProgress());
-            Debug.Log(iprog);
-            var iunlock = JsonConvert.SerializeObject(CardManager.SaveInnerUnlocks());
-            var ounlock = JsonConvert.SerializeObject(CardManager.SaveOuterUnlocks());
-            using FileStream ipfs = new FileStream(iProgPath, FileMode.Create);
-            using StreamWriter ipsw = new StreamWriter(ipfs);
-            using FileStream iufs = new FileStream(iUnPath, FileMode.Create);
-            using StreamWriter iusw = new StreamWriter(iufs);
-            using FileStream opfs = new FileStream(oProgPath, FileMode.Create);
-            using StreamWriter opsw = new StreamWriter(opfs);
-            using FileStream oufs = new FileStream(oUnPath, FileMode.Create);
-            using StreamWriter ousw = new StreamWriter(oufs);
-            ipsw.Write(iprog);
-            iusw.Write(iunlock);
-            opsw.Write(oprog);
-            ousw.Write(ounlock);*/
+            bw.Write(b);
         }
         catch (Exception e)
         {
@@ -83,11 +71,13 @@ public class Game : MonoBehaviour
         var progPath = Path.Combine(pathDir, "p.json");
         var unPath = Path.Combine(pathDir, "u.json");
         var tiPath = Path.Combine(pathDir, "t.json");
+        var bfPath = Path.Combine(pathDir, "b.json");
         var oUnPath = Path.Combine(pathDir, "ou.json");
 
         Dictionary<string, List<int>> fp = new();
         Dictionary<string, bool> fu = new();
         Dictionary<string, float> ft = new();
+        Dictionary<string, float> fb = new();
 
         if (File.Exists(unPath))
         {
@@ -139,18 +129,16 @@ public class Game : MonoBehaviour
                 throw;
             }
         }
-/*
-        if (File.Exists(iProgPath))
+
+        if (File.Exists(bfPath))
         {
             try
             {
                 var pData = "";
-                using FileStream pfs = new FileStream(iProgPath, FileMode.Open);
+                using FileStream pfs = new FileStream(bfPath, FileMode.Open);
                 using StreamReader psr = new StreamReader(pfs);
                 pData = psr.ReadToEnd();
-                var temp = JsonConvert.DeserializeObject<Dictionary<string, History>>(pData);
-                print(temp);
-                finalPi = JsonConvert.DeserializeObject<Dictionary<InnerCard, History>>(temp);
+                fb = JsonConvert.DeserializeObject<Dictionary<string, float>>(pData);
             }
             catch (Exception e)
             {
@@ -158,68 +146,13 @@ public class Game : MonoBehaviour
                 throw;
             }
         }
-
-        if (File.Exists(oProgPath))
-        {
-            try
-            {
-                var pData = "";
-                using FileStream pfs = new FileStream(oProgPath, FileMode.Open);
-                using StreamReader psr = new StreamReader(pfs);
-                pData = psr.ReadToEnd();
-                var temp = JsonConvert.DeserializeObject<Dictionary<string, History>>(pData).ToString();
-                finalPo = JsonConvert.DeserializeObject<Dictionary<OuterCard, History>>(temp);
-            }
-            catch (Exception e)
-            {
-                print(e);
-                throw;
-            }
-        }
-        
-        if (File.Exists(iUnPath))
-        {
-            try
-            {
-                var uData = "";
-                using FileStream ufs = new FileStream(iUnPath, FileMode.Open);
-                using StreamReader usr = new StreamReader(ufs);
-                uData = usr.ReadToEnd();
-                var temp = JsonConvert.DeserializeObject<Dictionary<string, bool>>(uData).ToString();
-                finalUi = JsonConvert.DeserializeObject<Dictionary<InnerCard, bool>>(temp);
-            }
-            catch (Exception e)
-            {
-                print("nope");
-                throw;
-            }
-        }
-
-        if (File.Exists(oUnPath))
-        {
-            try
-            {
-                var uData = "";
-                using FileStream ufs = new FileStream(oUnPath, FileMode.Open);
-                using StreamReader usr = new StreamReader(ufs);
-                uData = usr.ReadToEnd();
-                var temp = JsonConvert.DeserializeObject<Dictionary<string, bool>>(uData).ToString();
-                finalUo = JsonConvert.DeserializeObject<Dictionary<OuterCard, bool>>(temp);
-            }
-            catch (Exception e)
-            {
-                print("nope");
-                throw;
-            }
-        }*/
-
-
         
         if (fp.Count > 0 && fu.Count > 0)
         {
             CardManager.LoadP(fp);
             CardManager.LoadU(fu);
             CardManager.LoadT(ft);
+            CardManager.LoadB(fb);
         }
     }
     
@@ -275,6 +208,7 @@ public class Game : MonoBehaviour
             GameDifficulty.Easy => 25,
             GameDifficulty.LessEasy => 10,
             GameDifficulty.Akyuu => 1,
+            GameDifficulty.Extra => 1,
             _ => throw new ArgumentException("Unknown game difficulty!")
         };
         var upperLim = currentDifficulty switch
@@ -282,6 +216,7 @@ public class Game : MonoBehaviour
             GameDifficulty.Easy => 999,
             GameDifficulty.LessEasy => 35,
             GameDifficulty.Akyuu => 10,
+            GameDifficulty.Extra => 42,
             _ => throw new ArgumentException("Unknown game difficulty!")
         };
         

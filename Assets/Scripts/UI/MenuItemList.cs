@@ -19,7 +19,7 @@ namespace UI
         public MenuState menuState = MenuState.MainMenu;
         
         private readonly List<string> _mainMenuItemNames = new List<string> { "Tutorial", "Play!", "Collection", "Credits", "Quit!" };
-        private readonly List<string> _diffMenuItemNames = new List<string> {"Easy", "Less easy", "Akyuu", "ex", "Back!"};
+        private readonly List<string> _diffMenuItemNames = new List<string> {"Easy", "Less easy", "Akyuu", "EXTRA", "Back!"};
 
         public const float EndYAnchor = 0.18f;
 

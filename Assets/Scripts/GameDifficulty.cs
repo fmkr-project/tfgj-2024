@@ -6,5 +6,6 @@ public enum GameDifficulty
 {
     Easy,
     LessEasy,
-    Akyuu
+    Akyuu,
+    Extra
 }

@@ -202,6 +202,7 @@ public static class CardManager
                                item.GameDifficulty is GameDifficulty.Easy or GameDifficulty.LessEasy)
                            || (diff == GameDifficulty.Akyuu &&
                                item.GameDifficulty is GameDifficulty.LessEasy or GameDifficulty.Akyuu)
+                           || (diff == GameDifficulty.Extra)
             )
             .Where(item => Math.Abs(item.GetTrueDate() - reference.Year) > lowerLim
                            && Math.Abs(item.GetTrueDate() - reference.Year) < upperLim)
