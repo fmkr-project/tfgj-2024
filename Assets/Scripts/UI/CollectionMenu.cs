@@ -324,8 +324,8 @@ namespace UI
         }
 
         public float GetFlipTime()
-	{
-	    return _flipDuration;
+        { 
+            return _flipDuration;
         }
 
         private void UpdateArrowTexture()
@@ -353,13 +353,13 @@ namespace UI
                         CardTag.People => new Color(1f, 0.8f, 0.6f),
                         CardTag.Place => new Color(0.7f, 1f, 0.75f),
                         CardTag.Tech => new Color(0.55f, 0.55f, 0.8f),
-                        CardTag.DeadTech => new Color(0.55f, 0.55f, 0.55f)
+                        CardTag.DeadTech => new Color(0.58f, 0.58f, 0.58f)
                     };
             }
             
             // Update history
             transform.Find("Canvas/Card/History").GetComponent<TextMeshProUGUI>().SetText(
-                isUnlocked ? $"History: {CardManager.Progress[reference].Ok}/{CardManager.Progress[reference].Seen} avg {Math.Round(CardManager.ReturnAvg(reference), 2)}" : "");
+                isUnlocked ? $"History: {CardManager.Progress[reference].Ok}/{CardManager.Progress[reference].Seen} avg {Math.Round(CardManager.ReturnAvg(reference), 2)} best {Math.Round(CardManager.ReturnBest(reference), 2)}" : "");
             
             // Update image
             transform.Find("Canvas/Card/Image").GetComponent<Image>().sprite =

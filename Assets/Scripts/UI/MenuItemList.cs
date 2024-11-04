@@ -19,9 +19,11 @@ namespace UI
         public MenuState menuState = MenuState.MainMenu;
         
         private readonly List<string> _mainMenuItemNames = new List<string> { "Tutorial", "Play!", "Collection", "Credits", "Quit!" };
-        private readonly List<string> _diffMenuItemNames = new List<string> {"Easy", "Less easy", "Akyuu", "Back!"};
+        private readonly List<string> _diffMenuItemNames = new List<string> {"Easy", "Less easy", "Akyuu", "ex", "Back!"};
 
         public const float EndYAnchor = 0.18f;
+
+        public bool isReady;
 
         private void Start()
         {
@@ -29,12 +31,15 @@ namespace UI
             {
                 MakeNewMenuItem(itemName, _mainMenuItemNames.Count);
             }
+
+            isReady = true;
         }
 
         public IEnumerator ChangeMenuState(MenuState newState)
         {
             if (menuState == newState) yield break;
 
+            isReady = false;
             if (newState == MenuState.DiffMenu)
             {
                 menuState = MenuState.DiffMenu;
@@ -50,11 +55,9 @@ namespace UI
                     var corrected = i - GetMainMenuItemCount() + GetDiffMenuItemCount();
                     StartCoroutine(_menuItems[i].Yoink(_diffMenuItemNames[corrected]));
                 }
-                
-                yield break;
             }
 
-            if (newState == MenuState.MainMenu)
+            else if (newState == MenuState.MainMenu)
             {
                 menuState = MenuState.MainMenu;
                 // Show hidden items first
@@ -69,6 +72,10 @@ namespace UI
                     StartCoroutine(_menuItems[i].Yoink(_mainMenuItemNames[i]));
                 }
             }
+
+            yield return new WaitForSeconds(GetAnimationDuration());
+            
+            isReady = true;
         }
 
         public void DiscreteChangeMenuState(MenuState newState)
@@ -134,9 +141,17 @@ namespace UI
             }
         }
 
+        public int GetMaxItemCount()
+        {
+            return Math.Max(_mainMenuItemNames.Count, _diffMenuItemNames.Count);
+        }
+
         public IEnumerator HideAllItems()
         {
-            for (var i = menuState == MenuState.DiffMenu ? 1 : 0; i < _menuItems.Count; i++)
+            var startIndex = menuState == MenuState.DiffMenu
+                ? GetMaxItemCount() - GetDiffMenuItemCount()
+                : GetMaxItemCount() - GetMainMenuItemCount();
+            for (var i = startIndex; i < _menuItems.Count; i++)
                 StartCoroutine(_menuItems[i].Hide());
             yield return null;
         }
@@ -146,6 +161,11 @@ namespace UI
             foreach (var item in _menuItems)
                 StartCoroutine(item.Show());
             yield return null;
+        }
+
+        public float GetAnimationDuration()
+        {
+            return 2 * 0.11f; // TODO remove magic variable
         }
     }
 }

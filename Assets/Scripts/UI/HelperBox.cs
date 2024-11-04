@@ -53,7 +53,7 @@ namespace UI
                     _startPosition,
                     _startPosition + _animationOffset * Vector2.right,
                     (float) (6 * Math.Pow(t, 5) - 15 * Math.Pow(t, 4) + 10 * Math.Pow(t, 3)));
-                yield return new WaitForSeconds(deltaTime);
+                yield return null;
             }
         }
 

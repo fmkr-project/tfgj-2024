@@ -17,6 +17,8 @@ public static class CardManager
     
     public static Dictionary<Card, float> Time = new();
 
+    public static Dictionary<Card, float> BestTime = new();
+
     // JSON shenanigans.
     public static Dictionary<string, float> SaveT()
     {
@@ -43,6 +45,26 @@ public static class CardManager
         foreach (var notFound in _all.Except(t.Keys.Select(GetCardByName)).ToList())
         {
             Time[notFound] = 0;
+        }
+    }
+
+    public static Dictionary<string, float> SaveB()
+    {
+        return BestTime.ToDictionary(pair => pair.Key.ShortTitle, pair => pair.Value);
+    }
+
+    public static void LoadB(Dictionary<string, float> b)
+    {
+        foreach (var pair in b)
+        {
+            try
+            {
+                BestTime.Add(GetCardByName(pair.Key), pair.Value);
+            }
+            catch (ArgumentException)
+            {
+                BestTime[GetCardByName(pair.Key)] = pair.Value;
+            }
         }
     }
 
@@ -211,10 +233,26 @@ public static class CardManager
     public static void AddTime(Card c, float t)
     {
         Time[c] += t;
+        if (!BestTime.TryAdd(c, t))
+        {
+            if (BestTime[c] >= t) BestTime[c] = t;
+        }
     }
 
     public static float ReturnAvg(Card c)
     {
         return Time[c] / Progress[c].Ok;
+    }
+
+    public static float ReturnBest(Card c)
+    {
+        try
+        {
+            return BestTime[c];
+        }
+        catch (Exception)
+        {
+            return 999;
+        }
     }
 }

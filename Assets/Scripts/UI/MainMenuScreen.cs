@@ -25,6 +25,7 @@ namespace UI
         private bool _isCreditsMenuOpen;
         
         private HelperBox _helperBox;
+        private Timer _timer;
 
         public GameDifficulty selectedDifficulty;
         public int turnNumber;
@@ -62,6 +63,7 @@ namespace UI
             _creditsMenu = GetComponentInChildren<CreditsMenu>();
 
             _helperBox = GetComponentInChildren<HelperBox>();
+            _timer = GetComponentInChildren<Timer>();
         }
 
         private void Start()
@@ -118,6 +120,9 @@ namespace UI
 
                 return;
             }
+            
+            // Controls in the main menu.
+            if (!_menuItemList.isReady) return;
             
             // Arrow controls
             if (Input.GetKeyDown(KeyCode.W) && !_isInGame)
@@ -180,6 +185,10 @@ namespace UI
                         case "Akyuu":
                             selectedDifficulty = GameDifficulty.Akyuu;
                             StartCoroutine(StartGame());
+                            break;
+                        case "ex":
+                            selectedDifficulty = GameDifficulty.Akyuu;
+                            StartCoroutine(StartEx());
                             break;
                         case "Back!":
                             StartCoroutine(_menuItemList.ChangeMenuState(MenuState.MainMenu));
@@ -498,8 +507,6 @@ namespace UI
             
             callGame.Invoke();
             
-            // TODO Prepare a different dialogue for all 3 difficulties.
-            
             // Introduction dialogues.
             // TODO maybe different introduction dialogues in the same difficulty.
             if (selectedDifficulty == GameDifficulty.Easy)
@@ -610,7 +617,7 @@ namespace UI
             
             // Game loop.
             // Keep playing until the player finishes 6 cards.
-            // Randomly introduce some ambience dialogue
+            // TODO Randomly introduce some ambience dialogue
             while (turnNumber < 6)
             {
                 callNextTurn.Invoke();
@@ -796,6 +803,100 @@ namespace UI
             }
             
             // Return to the main menu. Change items to their main menu counterpart (we were in diff).
+            StartCoroutine(_arrow.Show());
+            _menuItemList.DiscreteChangeMenuState(MenuState.MainMenu);
+            _arrow.maxPosition = _menuItemList.GetMainMenuItemCount();
+            _arrow.position = 0;
+            StartCoroutine(_arrow.UpdateAnchors());
+            StartCoroutine(_logo.Show());
+            StartCoroutine(_menuItemList.ShowAllItems());
+
+            _uiCardManager.lastWasCorrect = true;
+            _isInGame = false;
+            
+            yield return null;
+        }
+
+        private IEnumerator StartEx()
+        {
+            StartCoroutine(_arrow.Hide());
+            _isInGame = true;
+            turnNumber = 0;
+            success = 0;
+            StartCoroutine(_menuItemList.HideAllItems());
+            yield return new WaitForSeconds(0.25f);
+            
+            callGame.Invoke();
+            
+            _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+            StartCoroutine(_dialogueManager.OtherAppear("Lorem ipsum dolor sit amet."));
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
+            StartCoroutine(_dialogueManager.OtherRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+
+            callNextTurn.Invoke();
+            _timer.time = 90f;
+            var j = Time.time;
+            _timer.ResetScore();
+            _timer.Refresh();
+            StartCoroutine(_timer.Show());
+            // Start showing the first batch of cards.
+            StartCoroutine(_uiCardManager.ShowCards());
+            yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+
+            _timer.Go();
+            while (true) // TODO oh no is infinite loop
+            {
+                var deltaTime = Time.deltaTime;
+                
+                // Do nothing if there's no player input.
+                if (!Input.GetKeyDown(KeyCode.W) && !Input.GetKeyDown(KeyCode.S))
+                {
+                    if (_timer.time <= 0)
+                    {
+                        StartCoroutine(_uiCardManager.HideCards());
+                        yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+                        break;
+                    }
+                    yield return new WaitForSeconds(deltaTime);
+                    continue;
+                }
+
+                var selected = Input.GetKeyDown(KeyCode.W) ? Selected.Up : Selected.Down;
+                StartCoroutine(_uiCardManager.Choose(selected, false, Time.time - j));
+                if (_uiCardManager.lastWasCorrect)
+                {
+                    _timer.ok++;
+                    _timer.time += 2f; // Reward good answers
+                }
+                else _timer.time -= 2f;
+                _timer.done++;
+                j = Time.time;
+                yield return new WaitForSeconds(_uiCardManager.AnswerAnimationDuration());
+                
+                StartCoroutine(_uiCardManager.HideCards());
+                yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+                turnNumber++;
+
+                if (_timer.time <= 0) break;
+                
+                callNextTurn.Invoke();
+                StartCoroutine(_uiCardManager.ShowCards());
+                yield return new WaitForSeconds(_uiCardManager.GetAnimationTime());
+            }
+
+            _dialogueManager.ChangeOtherTalking(new Who("Akyuu"));
+            StartCoroutine(_dialogueManager.OtherAppear("Hej!"));
+            while (!Input.GetKeyDown(KeyCode.Return)) yield return null;
+            yield return new WaitForSeconds(Time.deltaTime);
+            StartCoroutine(_dialogueManager.OtherRetire());
+            yield return new WaitForSeconds(_dialogueManager.GetAnimationWaitTime());
+            
+            _timer.Halt();
+            StartCoroutine(_timer.Hide());
+
+            // Same routine as the main game.
             StartCoroutine(_arrow.Show());
             _menuItemList.DiscreteChangeMenuState(MenuState.MainMenu);
             _arrow.maxPosition = _menuItemList.GetMainMenuItemCount();
