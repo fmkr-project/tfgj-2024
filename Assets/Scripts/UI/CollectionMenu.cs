@@ -359,7 +359,7 @@ namespace UI
             
             // Update history
             transform.Find("Canvas/Card/History").GetComponent<TextMeshProUGUI>().SetText(
-                isUnlocked ? $"History: {CardManager.Progress[reference].Ok}/{CardManager.Progress[reference].Seen} avg {Math.Round(CardManager.ReturnAvg(reference), 2)} best {Math.Round(CardManager.ReturnBest(reference), 2)}" : "");
+                isUnlocked ? $"History {CardManager.Progress[reference].Ok}/{CardManager.Progress[reference].Seen} avg {Math.Round(CardManager.ReturnAvg(reference), 2)} best {Math.Round(CardManager.ReturnBest(reference), 2)}" : "");
             
             // Update image
             transform.Find("Canvas/Card/Image").GetComponent<Image>().sprite =
